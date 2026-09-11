@@ -9,66 +9,63 @@ Vue.component('following', {
 		}
 	},
 template: `
-		<div>
+		<div class="ff-catalog">
             <nav-bar></nav-bar>
-            <div class="my-bungalows">
-                <div class="col-md-4 left-div overflow-auto" style="margin-left:22%;">
-                    <div class="container">
-                        <form class="justify-content-center">
-                            <table class="justify-content-center" style="width:90%; margin-left:5%; table-layout:fixed;" >
-                                <tr><td colspan="2"><input  v-model="searchName" class="update-text-profile" type="text" style="height:20px; font-size:12px; font-family:'poppins-light'; width: 20em;" placeholder="Offer's name" /></td>
-                                    <td ><input class="confirm-profile" type="button" style="background-color: #1b4560; font-size: 15px;" @click="search" value="Search"/></td>
-                                </tr>
-                                <br>
-                                <tr>
-                                    <td colspan="2">
-                                        <select class="select-sort" v-model="sortOption" name="select" id="format">
-                                            <option selected disabled>Sort by</option>
-                                            <option value="AscAlpha">Sort alphabetically (A-Z)</option>
-                                            <option value="DescAlpha">Sort alphabetically (Z-A)</option>
-                                            <option value="AscRating">Sort by average rating (Asc)</option>
-                                            <option value="DescRating">Sort by average rating (Desc)</option>
-                                            <option value="AscPrice">Sort by price: low to high</option>
-                                            <option value="DescPrice">Sort by price: hight to low</option>
-                                        </select>
-                                    </td>
-                                    <td><input class="confirm-profile" type="button" style="background-color: #1b4560; font-size: 15px;" @click="sortedArray" value="Sort"/></td>
-                                </tr>
-                                <br>
-                                <tr>
-                                    <td colspan="2">
-                                    	<select v-model="filterOptions" class="select-sort" name="select" id="format">
-                                    		<option selected value="noFilter">No filter applied</option>
-                                            <option value="BUNGALOW" >Bungalows</option>
-                                            <option value="BOAT">Boats</option>
-                                            <option value="COURSE">Courses</option>
-                                    	</select>
-                                    </td>
-                                    <td><input class="confirm-profile" type="button" style="background-color: #1b4560; font-size: 15px;" value="Filter" @click="filterArray"/></td>
-                                </tr>
-                            </table>
-                        </form>
-                        <div class="container mt-5">
-                            <div class="card mb-3" style="width: 96%; margin-left:2%; background-color:#225779;" v-for="o in offers">
-                                <div class="row g-0">
-                                    <div class="col-md-4" style="text-align:center;">
-                                        <img :src="o.path" class="img-fluid rounded" style="margin:0 auto;"alt="James Bond's Bungalow">
-                                    </div>
-                                    <div class="col-md-8">
-                                        <div class="card-body">
-                                            <h5 class="card-title text-start mt-3" style="color:#fff;font-family:poppins-bold; font-size:15px;">{{o.offer.offerName}}</h5>
-                                            <p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">{{o.offer.description}}</p>
-                                            <p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Unit price: {{o.offer.unitPrice}}</p>
-                                            <p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Rating: {{o.offer.rating}}</p>
-                                            <button v-show="o.followed" class="float-end btn btn-light" style="backgorund-color: #DED528" @click="follow(o.offer)">Unfollow</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+            <section class="ff-catalog__shell">
+                <div class="ff-section-head">
+                    <h2>Following</h2>
+                    <p>Offers you follow - search, sort, and filter by type.</p>
+                </div>
+                <div class="ff-filters">
+                    <div class="ff-filters__row">
+                        <label class="ff-control">
+                            <span>Offer name</span>
+                            <input v-model="searchName" class="ff-field" type="text" placeholder="Search followed offers" />
+                        </label>
+                        <label class="ff-control">
+                            <span>Sort results</span>
+                            <select class="ff-field" v-model="sortOption" @change="sortedArray">
+                                <option disabled value="">Choose order</option>
+                                <option value="AscAlpha">Name A-Z</option>
+                                <option value="DescAlpha">Name Z-A</option>
+                                <option value="AscRating">Rating up</option>
+                                <option value="DescRating">Rating down</option>
+                                <option value="AscPrice">Price up</option>
+                                <option value="DescPrice">Price down</option>
+                            </select>
+                        </label>
+                        <label class="ff-control">
+                            <span>Type</span>
+                            <select class="ff-field" v-model="filterOptions" @change="filterArray">
+                                <option value="noFilter">All types</option>
+                                <option value="BUNGALOW">Bungalows</option>
+                                <option value="BOAT">Boats</option>
+                                <option value="COURSE">Courses</option>
+                            </select>
+                        </label>
+                        <div class="ff-filters__actions">
+                            <button class="ff-btn ff-btn--primary" type="button" @click="search">Search</button>
                         </div>
                     </div>
+                    <p class="ff-filters__hint">Sort and type filter apply as soon as you change them.</p>
                 </div>
-            </div>
+                <div class="ff-product-grid">
+                    <article class="ff-product" v-for="o in offers" :key="o.offer.id">
+                        <div class="ff-product__media">
+                            <img :src="o.path || 'images/no-pictures.jpg'" :alt="o.offer.offerName">
+                        </div>
+                        <div class="ff-product__body">
+                            <h3>{{ o.offer.offerName }}</h3>
+                            <p class="ff-product__meta">{{ o.offer.unitPrice }} | * {{ o.offer.rating }}</p>
+                            <p>{{ o.offer.description }}</p>
+                            <div class="ff-product__actions">
+                                <button v-show="o.followed" class="ff-btn ff-btn--ink" type="button" @click="follow(o.offer)">Unfollow</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <p v-if="!offers.length" class="ff-empty">You are not following any offers yet.</p>
+            </section>
 		</div>
 		`
         ,

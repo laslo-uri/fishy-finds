@@ -12,7 +12,7 @@ import com.fishyfinds.isa.model.beans.users.owners.BoatOwner;
 import com.fishyfinds.isa.model.beans.users.owners.BungalowOwner;
 import com.fishyfinds.isa.model.enums.UserType;
 import com.fishyfinds.isa.repository.LoyaltyProgramRepository;
-import com.fishyfinds.isa.repository.usersRepository.*;
+import com.fishyfinds.isa.repository.users.*;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -29,7 +29,7 @@ public class RegistrationService {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
-    private BoatOwnerRepostory boatOwnerRepository;
+    private BoatOwnerRepository boatOwnerRepository;
     @Autowired
     private BungalowOwnerRepository bungalowOwnerRepository;
     @Autowired

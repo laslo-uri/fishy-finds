@@ -69,6 +69,9 @@ public class Offer {
     @Column(name = "cancellationPolicy", nullable = false)
     protected String cancellationPolicy;
 
+    @Column(name = "isDeleted", nullable = false, columnDefinition = "boolean default false")
+    protected boolean isDeleted = false;
+
    /* @OneToMany(mappedBy="id", fetch = FetchType.EAGER)
     protected Set<UserFeedback> reviews;*/
 

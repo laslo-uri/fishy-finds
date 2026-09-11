@@ -48,16 +48,19 @@ public class ComplaintController {
     }
 
     @GetMapping("/allPendingComplaints")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<Complaint> findAllPending(){
         return complaintService.findAllPending();
     }
 
     @GetMapping("/allAcceptedComplaints")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<Complaint> findAllAccepted(){
         return complaintService.findAllAccepted();
     }
 
     @PostMapping("/acceptComplaint")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean acceptComplaint(@RequestBody Map<String, String> message){
         try {
 
@@ -70,6 +73,7 @@ public class ComplaintController {
     }
 
     @PostMapping("/denyComplaint")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean denyComplaint(@RequestBody Map<String,String>map){
         try{
             return complaintService.denyComplaint(DtoToResolveComplaint.MapToResolveRequest(map));

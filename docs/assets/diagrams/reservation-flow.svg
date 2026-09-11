@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420">
+  <rect width="960" height="420" fill="#fafafa"/>
+  <defs>
+    <marker id="farr" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7 Z" fill="#ed1c24"/>
+    </marker>
+  </defs>
+  <style>
+    .t { font-family: 'Segoe UI', Calibri, sans-serif; fill: #1a1a1a; }
+    .h { font-family: 'Segoe UI', Calibri, sans-serif; fill: #1a1a1a; font-weight: 600; }
+    .s { font-family: 'Segoe UI', Calibri, sans-serif; fill: #5a5a5a; }
+    .w { font-family: 'Segoe UI', Calibri, sans-serif; fill: #fff; font-weight: 600; }
+    .m { font-family: Consolas, monospace; fill: #1a1a1a; font-size: 11px; }
+  </style>
+  <text x="40" y="28" class="h" font-size="16">Reservation happy path</text>
+  <text x="40" y="48" class="s" font-size="11">Customer books a free Term  �  mail is best-effort  �  overlap with OfferUnavailability is rejected</text>
+
+  <rect x="40" y="80" width="140" height="56" rx="4" fill="#ed1c24"/>
+  <text x="110" y="106" class="w" font-size="12" text-anchor="middle">SPA</text>
+  <text x="110" y="124" class="w" font-size="11" text-anchor="middle">makeReservation</text>
+
+  <line x1="180" y1="108" x2="220" y2="108" stroke="#ed1c24" stroke-width="2" marker-end="url(#farr)"/>
+
+  <rect x="220" y="80" width="160" height="56" rx="4" fill="#c41218"/>
+  <text x="300" y="106" class="w" font-size="12" text-anchor="middle">ReservationController</text>
+  <text x="300" y="124" class="w" font-size="11" text-anchor="middle">POST /api/&</text>
+
+  <line x1="380" y1="108" x2="420" y2="108" stroke="#ed1c24" stroke-width="2" marker-end="url(#farr)"/>
+
+  <rect x="420" y="80" width="160" height="56" rx="4" fill="#3e7a55"/>
+  <text x="500" y="106" class="w" font-size="12" text-anchor="middle">ReservationService</text>
+  <text x="500" y="124" class="w" font-size="11" text-anchor="middle">rules + locks</text>
+
+  <line x1="580" y1="108" x2="620" y2="108" stroke="#ed1c24" stroke-width="2" marker-end="url(#farr)"/>
+
+  <rect x="620" y="80" width="140" height="56" rx="4" fill="#2f6aa0"/>
+  <text x="690" y="106" class="w" font-size="12" text-anchor="middle">JPA</text>
+  <text x="690" y="124" class="w" font-size="11" text-anchor="middle">Term @Version</text>
+
+  <line x1="760" y1="108" x2="800" y2="108" stroke="#ed1c24" stroke-width="2" marker-end="url(#farr)"/>
+
+  <rect x="800" y="80" width="120" height="56" rx="4" fill="#c9a227"/>
+  <text x="860" y="106" class="w" font-size="12" text-anchor="middle">PostgreSQL</text>
+  <text x="860" y="124" class="w" font-size="11" text-anchor="middle">commit</text>
+
+  <text x="40" y="180" class="h" font-size="13">Checks inside ReservationService</text>
+  <text x="40" y="208" class="t" font-size="12">1. Authenticated customer (or owner booking for client) with JWT role</text>
+  <text x="40" y="232" class="t" font-size="12">2. Term exists, is free, endTime still in the future</text>
+  <text x="40" y="256" class="t" font-size="12">3. No OfferUnavailability overlap for the offer window</text>
+  <text x="40" y="280" class="t" font-size="12">4. Optimistic lock on Term / Reservation; pessimistic lock on customer row when needed</text>
+  <text x="40" y="304" class="t" font-size="12">5. Persist Reservation; ensure Penal row exists for customer</text>
+  <text x="40" y="328" class="t" font-size="12">6. MailService confirmation  SMTP failure does not roll back the booking</text>
+
+  <text x="40" y="368" class="s" font-size="11">Cancel: POST /api/cancelReservation  only if start is e 3 days away. Quick action: ReservationType.QUICK, customer=null, notify subscribers.</text>
+  <text x="40" y="392" class="m">Owner update of offer blocked while active reservations exist.</text>
+</svg>

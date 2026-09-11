@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FishyFinds — Technical Dossier</title>
+  <style>
+    :root { --ink:#1a1a1a; --muted:#5a5a5a; --line:#e5e5e5; --accent:#ed1c24; --bg:#fafafa; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: Cambria, Georgia, serif; color:var(--ink); background:var(--bg); line-height:1.55; }
+    .bar {
+      position:sticky; top:0; z-index:10; display:flex; gap:.75rem; align-items:center;
+      justify-content:space-between; padding:.75rem 1.25rem; background:#fff; border-bottom:1px solid var(--line);
+      font-family: Calibri, "Segoe UI", sans-serif;
+    }
+    .bar h1 { margin:0; font-size:1rem; }
+    .brand { color:var(--accent); font-weight:700; }
+    .langs button {
+      border:1px solid var(--ink); background:#fff; padding:.35rem .75rem; cursor:pointer; font-weight:600;
+    }
+    .langs button.active { background:var(--ink); color:#fff; }
+    main { max-width:920px; margin:0 auto; padding:1.5rem 1.25rem 3rem; background:#fff; }
+    h2 { margin-top:2rem; border-left:4px solid var(--accent); padding-left:.6rem; font-size:1.2rem;
+      font-family: Calibri, "Segoe UI", sans-serif; color:var(--accent); }
+    h3 { margin-top:1.25rem; font-size:1.05rem; font-family: Calibri, "Segoe UI", sans-serif; color:#2f6aa0; }
+    table { width:100%; border-collapse:collapse; margin:.75rem 0 1rem; font-size:.92rem; }
+    th, td { border:1px solid var(--line); padding:.45rem .55rem; text-align:left; vertical-align:top; }
+    th { background:#fde8e9; }
+    pre { background:#f6f6f6; border:1px solid var(--line); padding:.75rem; overflow-x:auto; font-size:.82rem; }
+    figure { margin:1rem 0 1.5rem; border:1px solid var(--line); background:#fff; }
+    figure img { display:block; width:100%; height:auto; }
+    figcaption { padding:.5rem .75rem; font-size:.85rem; color:var(--muted); border-top:1px solid var(--line); background:#fcfcfc;
+      font-family: Calibri, "Segoe UI", sans-serif; }
+    .lang { display:none; }
+    .lang.show { display:block; }
+    @media print {
+      .bar { display:none !important; }
+      .lang { display:none !important; }
+      .lang.print-show { display:block !important; }
+      main { max-width:none; padding:0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <h1><span class="brand">FISHYFINDS</span> · Technical dossier</h1>
+    <div class="langs">
+      <button type="button" id="btn-en" class="active" onclick="setLang('en')">English</button>
+      <button type="button" id="btn-sr" onclick="setLang('sr')">Srpski</button>
+      <button type="button" onclick="window.print()">Print / PDF</button>
+    </div>
+  </div>
+  <main>
+    <section id="lang-en" class="lang show print-show"><h2 id="s1">Document control</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Title</td>
+<td>Technical Dossier, FishyFinds (ISA)</td>
+</tr>
+<tr>
+<td>Dossier version</td>
+<td>1.0.0</td>
+</tr>
+<tr>
+<td>Software</td>
+<td>FishyFinds / artifact <code>com.fishyfinds:isa</code> <code>0.0.1-SNAPSHOT</code></td>
+</tr>
+<tr>
+<td>Course</td>
+<td>Internet Software Architectures (ISA), FTN UNS, 2021/22</td>
+</tr>
+<tr>
+<td>Compiled</td>
+<td>9 September 2026</td>
+</tr>
+<tr>
+<td>Authors</td>
+<td>Natalija Simin (Guest / Customer), Laslo Uri (Bungalow / Boat owner), David Jandrić (Instructor / Admin)</td>
+</tr>
+<tr>
+<td>Institution</td>
+<td>Faculty of Technical Sciences, University of Novi Sad, Computing and Control Engineering</td>
+</tr>
+<tr>
+<td>Live check</td>
+<td><code>scripts/full-smoke.ps1</code> <strong>66/66 PASS</strong>; Maven service tests green (JDK 17)</td>
+</tr>
+<tr>
+<td>Local entry</td>
+<td><code>http://localhost:8080</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s2">1. Purpose of the subject</h2>
+<p><strong>Internet Software Architectures (ISA)</strong> is the FTN course where a three-student team designs and ships a multi-role web system with a real persistence layer, authentication, and graded non-functional topics (concurrency, DevOps, scalability). The exam expects:</p>
+<ul>
+<li>a shared product with <strong>role-split ownership</strong> (each student defends a persona),</li>
+<li>REST + SPA (or equivalent) over a relational database,</li>
+<li>documented concurrent-access behaviour,</li>
+<li>automated tests and CI,</li>
+<li>a short scalability argument with at least one concrete mechanism in code.</li>
+</ul>
+<p>This dossier is the archive write-up for that defense: what the system is for, how it is built, what each grade band covers, and what the live UI looked like when verified in September 2026.</p>
+<h2 id="s3">2. Purpose of the project</h2>
+<p><strong>FishyFinds</strong> is a fishing-tourism marketplace. Guests browse coastal bungalows, boats, and instructor-led courses. Registered customers reserve and cancel slots. Advertisers (bungalow owners, boat owners, instructors) publish offers, manage availability, run discount “quick actions,” book for walk-in clients, and read occupancy / income charts. Administrators moderate registrations, reviews, complaints, account deletions, no-show penalties, the loyalty ladder, the user/offer directory, and the platform income cut.</p>
+<p>The product is intentionally one Spring Boot process serving a Vue 2 SPA from <code>static/</code>, backed by PostgreSQL. It is a course system, not a hosted production SaaS: SMTP may be unset, passwords are demo-level, and schema is recreated from seed on boot (<code>create-drop</code> + <code>data-postgres.sql</code>).</p>
+<h2 id="s4">3. Identification</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display name</td>
+<td><strong>FISHYFINDS</strong> (red fish mark, black wordmark)</td>
+</tr>
+<tr>
+<td>English product name</td>
+<td>FishyFinds — coastal stays &amp; fishing days</td>
+</tr>
+<tr>
+<td>Serbian product name</td>
+<td>FishyFinds — obalski smeštaj i ribolovni dani</td>
+</tr>
+<tr>
+<td>Kind</td>
+<td>Multi-role web application (SPA + REST)</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>Java 11 target, Spring Boot <strong>2.5.7</strong>, runs on JDK 17+</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>Vue 2 (CDN), Vue Router history mode, Axios, SweetAlert2</td>
+</tr>
+<tr>
+<td>Maps / charts</td>
+<td>OpenLayers 6, Chart.js</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>Spring Data JPA, Hibernate, PostgreSQL database <code>fishyfinds_db</code></td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Spring Security + JWT (<code>TokenUtils</code>), roles via <code>@PreAuthorize</code></td>
+</tr>
+<tr>
+<td>Mail</td>
+<td>Spring Mail (verification, booking, admin decisions; failures non-fatal)</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Maven Wrapper; GitHub Actions; SonarCloud</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>JUnit 5 + Mockito; PowerShell live smoke (<code>scripts/full-smoke.ps1</code>)</td>
+</tr>
+<tr>
+<td>UI language</td>
+<td>English chrome (course SPA)</td>
+</tr>
+<tr>
+<td>Doc languages</td>
+<td>English (this file) · Serbian Latin (<a href="DOSSIER_SR.md">DOSSIER_SR.md</a>)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Author</th>
+<th>Course roles</th>
+<th>Main surfaces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Natalija Simin</td>
+<td>Guest, Customer</td>
+<td>Catalogs, register/activate, search &amp; book, cancel (≥3 days), history, feedback, follow, complaints, penalties, profile</td>
+</tr>
+<tr>
+<td>Laslo Uri</td>
+<td>Bungalow owner, Boat owner</td>
+<td>Offer CRUD, terms, quick actions, book-for-client, maps, unavailability calendar, <code>/owner-reports</code></td>
+</tr>
+<tr>
+<td>David Jandrić</td>
+<td>Instructor, Admin</td>
+<td>Courses, visit reports, loyalty, admin queues (registrations, reviews, complaints, deletions, penalties, directory, income)</td>
+</tr>
+</tbody>
+</table>
+<p>Seed password for all demo accounts: <strong><code>password</code></strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Email</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mail@mail.com</code></td>
+<td>Customer</td>
+</tr>
+<tr>
+<td><code>zokaMagic@mail.com</code></td>
+<td>Bungalow owner</td>
+</tr>
+<tr>
+<td><code>zokiSumi@mail.com</code></td>
+<td>Boat owner</td>
+</tr>
+<tr>
+<td><code>vesnaVuki@mail.com</code></td>
+<td>Instructor</td>
+</tr>
+<tr>
+<td><code>admin@admin.com</code></td>
+<td>Admin</td>
+</tr>
+<tr>
+<td><code>pending.owner@mail.com</code></td>
+<td>Pending registration</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s5">4. Scope</h2>
+<p>In scope: browsing three offer types; JWT login; customer booking/cancel; owner/instructor offer lifecycle (create, edit blocked while reserved, soft-delete, terms, quick actions, book-for-client); OpenLayers maps; occupancy / unavailability calendar; Chart.js reports; loyalty configuration; full admin moderation hub; concurrent-access write-ups; service tests; catalog caching for the scalability PoC.</p>
+<p>Out of scope / honest limits: production SMTP hardening, multi-tenant hosting, pixel-perfect capture of every nested admin modal, and a full human click-through of every SweetAlert path. Live smoke covers <strong>66</strong> API/UI-critical checks across roles; that is the verification bar used for this dossier.</p>
+<h2 id="s6">5. Technology stack (explained)</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Choice</th>
+<th>Why it is here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spring Boot 2.5.7</td>
+<td>Application container</td>
+<td>Course-era stack: embedded Tomcat, auto-config for Web, Security, JPA, Mail</td>
+</tr>
+<tr>
+<td>Spring Web / Data REST</td>
+<td>HTTP surface</td>
+<td>Controllers under <code>controllers/</code> expose <code>/api/**</code>; SPA is static</td>
+</tr>
+<tr>
+<td>Spring Security + JWT</td>
+<td>AuthN/Z</td>
+<td>Stateless API: login returns token; filter parses <code>Authorization</code>; method security by role</td>
+</tr>
+<tr>
+<td>Spring Data JPA / Hibernate</td>
+<td>ORM</td>
+<td>Maps <code>User</code> hierarchy and <code>Offer</code> subtypes to PostgreSQL; <code>@Version</code> for optimistic locking</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>RDBMS</td>
+<td>Relational integrity for reservations overlapping terms; seed via <code>data-postgres.sql</code></td>
+</tr>
+<tr>
+<td>Spring Mail</td>
+<td>Notifications</td>
+<td>Activation, booking, subscriber quick-action mail; wrapped so missing SMTP does not fail bookings</td>
+</tr>
+<tr>
+<td>Vue 2 CDN SPA</td>
+<td>UI</td>
+<td>Fast course delivery without a Node build pipeline; components in <code>static/</code></td>
+</tr>
+<tr>
+<td>Vue Router (history)</td>
+<td>Client routes</td>
+<td>Pretty URLs; <code>SpaForwardController</code> forwards unknown GETs to <code>index.html</code></td>
+</tr>
+<tr>
+<td>Axios</td>
+<td>HTTP client</td>
+<td>Attaches JWT; talks to <code>/api</code></td>
+</tr>
+<tr>
+<td>OpenLayers 6</td>
+<td>Maps (grade 7)</td>
+<td>Offer detail maps from <code>Location</code> coordinates</td>
+</tr>
+<tr>
+<td>Chart.js</td>
+<td>Analytics (grade 7)</td>
+<td>Owner occupancy / income charts; admin finance views</td>
+</tr>
+<tr>
+<td>Spring Cache <code>@Cacheable</code></td>
+<td>Scalability PoC (grade 10)</td>
+<td>Catalog <code>findAll</code> for bungalows / boats / courses</td>
+</tr>
+<tr>
+<td>Maven + GHA + Sonar</td>
+<td>DevOps (grade 9)</td>
+<td>Build, test, static analysis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source layout</strong></p>
+<pre><code class="language-text">src/main/java/com/fishyfinds/isa/
+  controllers/     REST (offers, users, terms, admin, analytics…)
+  service/         Business rules (reservation, mail, loyalty…)
+  model/           JPA entities + enums
+  repository/      Spring Data interfaces
+  security/        JWT filter, TokenUtils
+  config/          Security, cache, SPA forward
+src/main/resources/static/          Vue SPA (kebab-case pages)
+src/main/resources/data-postgres.sql
+docs/concurrent-access/             Grade 8 PDFs + MD
+docs/scalability/SCALABILITY_POC.md Grade 10 write-up
+scripts/full-smoke.ps1              Live verification
+</code></pre>
+<h2 id="s7">6. System architecture</h2>
+<figure class="diagram"><img alt="Architecture" src="../assets/diagrams/architecture.svg" /><figcaption>Figure 1. Browser Vue SPA → Spring Boot (:8080) → controllers/services → JPA → PostgreSQL. JWT travels in <code>localStorage</code> and the <code>Authorization</code> header. Catalog reads may hit Spring Cache.</figcaption></figure>
+<figure class="diagram"><img alt="Use cases" src="../assets/diagrams/use-case.svg" /><figcaption>Figure 2. Role split matching the three ISA students, plus shared grade 7–10 concerns.</figcaption></figure>
+<figure class="diagram"><img alt="Reservation flow" src="../assets/diagrams/reservation-flow.svg" /><figcaption>Figure 3. Customer (or owner-for-client) booking path: controller → service checks → optimistic/pessimistic locks → commit → best-effort mail.</figcaption></figure>
+<p>Runtime is a <strong>single JVM</strong>. There is no separate Node server. Static assets and REST share origin <code>localhost:8080</code>, which simplifies CORS for the course demo.</p>
+<h2 id="s8">7. Domain model (application detail)</h2>
+<p><strong>Users.</strong> <code>User</code> implements <code>UserDetails</code>. Subtypes: <code>Customer</code>, <code>BungalowOwner</code>, <code>BoatOwner</code>, <code>Instructor</code>, <code>Admin</code>, plus <code>Authority</code> / registration status. Owners and instructors register as advertisers and wait for admin approval; customers activate via mail token when SMTP is configured.</p>
+<p><strong>Offers.</strong> Abstract <code>Offer</code> with <code>Location</code>, <code>ImageItem</code>, <code>AdditionalService</code>, <code>Price</code>. Concrete types: <code>Bungalow</code>, <code>Boat</code> (with <code>Engine</code>), <code>Course</code> (instructor link). Soft-delete and “no edit while active reservations” protect booked inventory.</p>
+<p><strong>Scheduling.</strong> <code>Term</code> is a bookable window on an offer (<code>@Version</code>). <code>Reservation</code> binds a customer (or null for <code>ReservationType.QUICK</code>) to a term. <code>CancelledReservation</code> records cancels. <code>OfferUnavailability</code> blocks calendar ranges so bookings cannot overlap closed periods (grade 7).</p>
+<p><strong>Moderation &amp; loyalty.</strong> <code>Complaint</code>, <code>UserFeedback</code>, <code>AccountDeletionRequest</code>, <code>Penal</code>, <code>LoyaltyProgram</code>, per-role loyalty rows (<code>CustomerLoyalty</code>, <code>OwnerLoyalty</code>, <code>InstructorLoyalty</code>), <code>VisitReport</code>, <code>Subscriber</code> (follow offer → mail on quick action).</p>
+<p><strong>Key rules coded in services</strong></p>
+<ul>
+<li>Cancel only if the reservation starts in <strong>≥ 3 days</strong>.</li>
+<li><code>createQuickAction</code> creates a quick reservation and emails subscribers (<code>MailService.sendNewActionEmail</code>).</li>
+<li><code>updateBungalow|Boat|Course/{id}</code> refused when active reservations exist.</li>
+<li>Terms returned by <code>getTermsByOfferId</code> only if <code>endTime</code> is still after “now” (seed windows pushed to <strong>2027</strong> so the 2026 archive run stays bookable).</li>
+<li>Missing customer <code>Penal</code> row is auto-created on booking so penalty flows never NPE.</li>
+<li>Duplicate <code>DELETE /api/deleteUser/{id}</code> mapping was removed; directory delete stays on <code>AdminDirectoryController</code>.</li>
+</ul>
+<h2 id="s9">8. Functional specification by role</h2>
+<p><strong>Guest.</strong> Landing hero; browse bungalows / boats / courses; open details (description, price, rating, map); register; sign in.</p>
+<p><strong>Customer.</strong> Search/sort catalogs; reserve a free term; see upcoming / history; cancel with the 3-day rule; leave feedback; follow offers for actions; file complaints; view penalties; edit profile.</p>
+<p><strong>Bungalow / boat owner.</strong> My listings with Details / Terms / Edit / Actions / Book for client / Delete; add terms via daterange UI; publish quick actions; mark unavailability on calendar; open <code>/owner-reports</code> charts; visit report entry points where applicable.</p>
+<p><strong>Instructor.</strong> Same offer-management parity on courses (<code>/my-courses</code>): terms, actions, book-for-client, calendar, reports.</p>
+<p><strong>Admin.</strong> Dashboard tiles: registrations, complaints, reviews, deletion requests, penalties, directory, register admin, loyalty, income / system cut. Each tile opens a moderation queue with accept/deny style decisions and optional mail.</p>
+<h2 id="s10">9. Grade ladder (ISA 6 → 10)</h2>
+<table>
+<thead>
+<tr>
+<th>Grade</th>
+<th>Expectation</th>
+<th>What is in this tree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>6</strong></td>
+<td>Core §3 marketplace</td>
+<td>Terms UI for all offer types; <code>POST /api/createQuickAction</code> + subscriber mail; <code>PUT</code> update endpoints; book-for-client; soft-delete</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>Maps, charts, calendar, loyalty</td>
+<td>OpenLayers on details; Chart.js reports; <code>OfferUnavailability</code>; <code>/admin-loyalty</code></td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td>Concurrent access</td>
+<td>PDFs under <code>docs/concurrent-access/</code> (Students 1–3); <code>@Version</code> + locks in services</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td>DevOps + tests</td>
+<td>GitHub Actions, SonarCloud; Mockito tests for reservation create/cancel, quick action, loyalty CRUD, penal approve</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>Scalability</td>
+<td><code>docs/scalability/SCALABILITY_POC.md</code>; <code>@Cacheable</code> on catalog <code>findAll</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s11">10. User interface (live captures)</h2>
+<p>Screens captured from the local app on 9 September 2026 against seeded data. Images live in <a href="../screenshots/"><code>../screenshots/</code></a>.</p>
+<h3>10.1 Guest and customer</h3>
+<figure class="shot"><img alt="Guest home" src="../screenshots/01-guest-home.png" /><figcaption>Figure 4. Guest home — harbor hero, brand </em><em>FISHYFINDS</em><em>, CTAs for bungalows / boats / courses, REGISTER and SIGN IN in the chrome.</figcaption></figure>
+<figure class="shot"><img alt="Bungalow catalog" src="../screenshots/02-bungalows.png" /><figcaption>Figure 5. Public bungalow catalog — card grid with photo, price, rating, location; entry point for guest browsing and customer search.</figcaption></figure>
+<figure class="shot"><img alt="Sign in" src="../screenshots/03-sign-in.png" /><figcaption>Figure 6. Sign-in — JWT login against <code>/api</code> authentication; demo accounts use password <code>password</code>.</figcaption></figure>
+<figure class="shot"><img alt="Boats catalog" src="../screenshots/13-boats-catalog.png" /><figcaption>Figure 7. Boats catalog — same product-card pattern as bungalows; owner role later manages these via My boats.</figcaption></figure>
+<figure class="shot"><img alt="Courses catalog" src="../screenshots/14-courses-catalog.png" /><figcaption>Figure 8. Courses catalog — instructor-led fishing courses exposed to guests and customers.</figcaption></figure>
+<figure class="shot"><img alt="Make reservation" src="../screenshots/04-make-reservation.png" /><figcaption>Figure 9. Reservation flow UI — customer selects a free term on an offer and confirms booking (service enforces availability and unavailability rules).</figcaption></figure>
+<figure class="shot"><img alt="Upcoming reservations" src="../screenshots/05-upcoming.png" /><figcaption>Figure 10. Customer upcoming reservations — cancel is offered only when the ≥3-day rule still holds.</figcaption></figure>
+<h3>10.2 Owners and instructor</h3>
+<figure class="shot"><img alt="My bungalows" src="../screenshots/06-owner-bungalows.png" /><figcaption>Figure 11. My bungalows (Laslo / bungalow owner) — search/sort, ADD BUNGALOW, and per-card Details / Terms / Edit / Actions / Book for client / Delete.</figcaption></figure>
+<figure class="shot"><img alt="My boats" src="../screenshots/15-my-boats.png" /><figcaption>Figure 12. My boats — boat-owner parity with the bungalow management surface.</figcaption></figure>
+<figure class="shot"><img alt="My courses" src="../screenshots/16-my-courses.png" /><figcaption>Figure 13. My courses (instructor) — course CRUD and the same term/action/book tools as other advertisers.</figcaption></figure>
+<figure class="shot"><img alt="Owner calendar" src="../screenshots/07-owner-calendar.png" /><figcaption>Figure 14. Owner calendar — occupancy plus <code>OfferUnavailability</code> blocks so closed ranges cannot be booked.</figcaption></figure>
+<figure class="shot"><img alt="Owner reports" src="../screenshots/08-owner-reports.png" /><figcaption>Figure 15. Owner reports — Chart.js business charts (occupancy / income style analytics for the advertiser).</figcaption></figure>
+<h3>10.3 Admin</h3>
+<figure class="shot"><img alt="Admin home" src="../screenshots/09-admin-home.png" /><figcaption>Figure 16. Admin dashboard — tile hub for registrations, complaints, reviews, deletions, penalties, directory, register-admin, loyalty, income.</figcaption></figure>
+<figure class="shot"><img alt="Admin registrations" src="../screenshots/10-admin-registrations.png" /><figcaption>Figure 17. Registrations queue — approve or deny pending advertiser registrations.</figcaption></figure>
+<figure class="shot"><img alt="Admin complaints" src="../screenshots/11-admin-complaints.png" /><figcaption>Figure 18. Complaints queue — resolve customer complaints with admin decision mail when SMTP is available.</figcaption></figure>
+<figure class="shot"><img alt="Admin income" src="../screenshots/12-admin-income.png" /><figcaption>Figure 19. Income / system cut — platform finance overview for the administrator.</figcaption></figure>
+<figure class="shot"><img alt="Admin loyalty" src="../screenshots/17-admin-loyalty.png" /><figcaption>Figure 20. Loyalty program — configure categories and point rates (grade 7 epic owned with the instructor/admin student).</figcaption></figure>
+<h2 id="s12">11. Security, mail, and data</h2>
+<ul>
+<li>Passwords stored with Spring Security hashing; API authorization is JWT + role checks.</li>
+<li>Registration for advertisers stays <code>PENDING</code> until admin approval.</li>
+<li>Mail is <strong>best-effort</strong>: booking and quick-action success paths do not depend on a working SMTP server (important for offline demos).</li>
+<li>Schema strategy for demos: Hibernate <code>create-drop</code> reloads <code>data-postgres.sql</code> each boot. Term dates in seed use <strong>2027</strong> windows. Sequence <code>setval</code> calls keep <code>loyalty_program</code> / <code>penal</code> inserts from colliding with identity columns.</li>
+</ul>
+<h2 id="s13">12. Concurrency, tests, and scalability</h2>
+<p><strong>Concurrency (grade 8).</strong> Optimistic <code>@Version</code> on <code>Term</code> and <code>Reservation</code>; pessimistic locking on customer lookup where double-booking races matter. Narrative + diagrams: <code>docs/concurrent-access/</code> (Student 1 client, Student 2 owners, Student 3 admin/instructor).</p>
+<p><strong>Tests (grade 9).</strong> Service-level Mockito coverage for reservation create/cancel, quick action, loyalty CRUD, and penal approval. <code>./mvnw test</code> on JDK 17 is green. Live regression: <code>scripts/full-smoke.ps1</code> (66 checks).</p>
+<p><strong>Scalability (grade 10).</strong> Written PoC discusses partitioning, read replicas, load balancing, and caching. In code, catalog <code>findAll</code> endpoints are <code>@Cacheable</code> so repeated guest traffic does not always hit PostgreSQL.</p>
+<h2 id="s14">13. Build and run (2026 check)</h2>
+<pre><code class="language-text"># PostgreSQL: database fishyfinds_db (defaults user/password root/root;
+# override with DB_USERNAME / DB_PASSWORD — do not commit secrets)
+
+./mvnw spring-boot:run
+# open http://localhost:8080
+
+./mvnw test
+powershell -File scripts/full-smoke.ps1
+powershell -File scripts/capture-screenshots.ps1
+</code></pre>
+<p>JDK <strong>17+</strong> recommended even though <code>pom.xml</code> declares Java 11. App serves SPA and API on port <strong>8080</strong>.</p>
+<h2 id="s15">14. Summary</h2>
+<p>FishyFinds is the ISA 2021/22 team archive: a Spring Boot + Vue 2 + PostgreSQL marketplace for bungalows, boats, and fishing courses, with a clear three-student role split, JWT security, admin moderation, maps/charts/calendar/loyalty, concurrent-access documentation, automated tests/CI, and a caching-backed scalability note. Verified locally on 9 September 2026 with <strong>66/66</strong> smoke checks and green Maven tests. This dossier pairs English and Serbian Latin editions for the oral defense and for later rebuilds of the archive.</p>
+<h2 id="s16">15. Related documents</h2>
+<table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Serbian dossier</td>
+<td><a href="DOSSIER_SR.md">DOSSIER_SR.md</a></td>
+</tr>
+<tr>
+<td>Interactive HTML</td>
+<td><a href="dossier.html">dossier.html</a></td>
+</tr>
+<tr>
+<td>Concurrent access</td>
+<td><code>../concurrent-access/</code></td>
+</tr>
+<tr>
+<td>Scalability PoC</td>
+<td><code>../scalability/SCALABILITY_POC.md</code></td>
+</tr>
+<tr>
+<td>Screenshots</td>
+<td><code>../screenshots/</code></td>
+</tr>
+<tr>
+<td>Diagrams</td>
+<td><code>../assets/diagrams/</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>FishyFinds ISA technical dossier — English edition.</em></p></section>
+    <section id="lang-sr" class="lang"><h2 id="s1">Kontrola dokumenta</h2>
+<table>
+<thead>
+<tr>
+<th>Polje</th>
+<th>Vrednost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Naslov</td>
+<td>Tehnički dosije, FishyFinds (ISA)</td>
+</tr>
+<tr>
+<td>Verzija dosijea</td>
+<td>1.0.0</td>
+</tr>
+<tr>
+<td>Softver</td>
+<td>FishyFinds / artefakt <code>com.fishyfinds:isa</code> <code>0.0.1-SNAPSHOT</code></td>
+</tr>
+<tr>
+<td>Predmet</td>
+<td>Internet softverske arhitekture (ISA), FTN UNS, 2021/22</td>
+</tr>
+<tr>
+<td>Sastavljeno</td>
+<td>9. septembra 2026.</td>
+</tr>
+<tr>
+<td>Autori</td>
+<td>Natalija Simin (gost / klijent), Laslo Uri (vlasnik bungalova / broda), David Jandrić (instruktor / admin)</td>
+</tr>
+<tr>
+<td>Institucija</td>
+<td>Fakultet tehničkih nauka, Univerzitet u Novom Sadu, Računarstvo i automatika</td>
+</tr>
+<tr>
+<td>Provera</td>
+<td><code>scripts/full-smoke.ps1</code> <strong>66/66 PASS</strong>; Maven servisni testovi zeleni (JDK 17)</td>
+</tr>
+<tr>
+<td>Lokalni ulaz</td>
+<td><code>http://localhost:8080</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s2">1. Cilj predmeta</h2>
+<p><strong>Internet softverske arhitekture (ISA)</strong> je predmet na FTN-u gde tim od tri studenta projektuje i isporučuje višekorisnički veb sistem sa pravom perzistencijom, autentifikacijom i ocenjivanim nefunkcionalnim temama (konkurentnost, DevOps, skalabilnost). Za odbranu se očekuje:</p>
+<ul>
+<li>zajednički proizvod sa <strong>podelom uloga</strong> (svaki student brani svoju personu),</li>
+<li>REST + SPA (ili ekvivalent) nad relacionom bazom,</li>
+<li>dokumentovano ponašanje pri konkurentnom pristupu,</li>
+<li>automatski testovi i CI,</li>
+<li>kratka argumentacija skalabilnosti uz bar jedan konkretan mehanizam u kodu.</li>
+</ul>
+<p>Ovaj dosije je arhivski zapis te odbrane: čemu sistem služi, kako je složen, šta pokriva svaki opseg ocena i kako je izgledao živi UI u septembru 2026.</p>
+<h2 id="s3">2. Cilj projekta</h2>
+<p><strong>FishyFinds</strong> je marketplace za ribolovni turizam. Gosti pregledaju obalske bungalove, brodove i kurseve sa instruktorom. Registrovani klijenti rezervišu i otkazuju termine. Oglašivači (vlasnici bungalova, vlasnici brodova, instruktori) objavljuju ponude, uređuju dostupnost, pokreću popustne „brze akcije“, rezervišu za klijenta na licu mesta i čitaju grafikone zauzetosti / prihoda. Administratori moderiraju registracije, recenzije, žalbe, zahteve za brisanje naloga, penale zbog nedolaska, loyalty lestvicu, direktorijum korisnika/ponuda i sistemski udeo prihoda.</p>
+<p>Proizvod je namerno jedan Spring Boot proces koji služi Vue 2 SPA iz <code>static/</code>, uz PostgreSQL. To je kursni sistem, ne produkcioni SaaS: SMTP može biti isključen, lozinke su demo, šema se na svakom startu gradi iz seed-a (<code>create-drop</code> + <code>data-postgres.sql</code>).</p>
+<h2 id="s4">3. Identifikacija</h2>
+<table>
+<thead>
+<tr>
+<th>Stavka</th>
+<th>Detalj</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prikazni naziv</td>
+<td><strong>FISHYFINDS</strong> (crveni znak ribe, crni wordmark)</td>
+</tr>
+<tr>
+<td>Engleski naziv</td>
+<td>FishyFinds — coastal stays &amp; fishing days</td>
+</tr>
+<tr>
+<td>Srpski naziv</td>
+<td>FishyFinds — obalski smeštaj i ribolovni dani</td>
+</tr>
+<tr>
+<td>Vrsta</td>
+<td>Višekorisnička veb aplikacija (SPA + REST)</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>Java 11 target, Spring Boot <strong>2.5.7</strong>, radi na JDK 17+</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>Vue 2 (CDN), Vue Router history, Axios, SweetAlert2</td>
+</tr>
+<tr>
+<td>Mape / grafikoni</td>
+<td>OpenLayers 6, Chart.js</td>
+</tr>
+<tr>
+<td>Persistencija</td>
+<td>Spring Data JPA, Hibernate, PostgreSQL baza <code>fishyfinds_db</code></td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Spring Security + JWT (<code>TokenUtils</code>), uloge preko <code>@PreAuthorize</code></td>
+</tr>
+<tr>
+<td>Mejl</td>
+<td>Spring Mail (verifikacija, rezervacije, admin odluke; greške nisu fatalne)</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Maven Wrapper; GitHub Actions; SonarCloud</td>
+</tr>
+<tr>
+<td>Testovi</td>
+<td>JUnit 5 + Mockito; PowerShell živi smoke (<code>scripts/full-smoke.ps1</code>)</td>
+</tr>
+<tr>
+<td>Jezik UI</td>
+<td>Engleski chrome (kursni SPA)</td>
+</tr>
+<tr>
+<td>Jezici dokumentacije</td>
+<td>Srpski latinica (ovaj fajl) · English (<a href="DOSSIER_EN.md">DOSSIER_EN.md</a>)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Autor</th>
+<th>Uloge na predmetu</th>
+<th>Glavne površine</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Natalija Simin</td>
+<td>Gost, klijent</td>
+<td>Katalozi, registracija/aktivacija, pretraga i rezervacija, otkazivanje (≥3 dana), istorija, feedback, praćenje, žalbe, penali, profil</td>
+</tr>
+<tr>
+<td>Laslo Uri</td>
+<td>Vlasnik bungalova, vlasnik broda</td>
+<td>CRUD ponuda, termini, brze akcije, rezervacija za klijenta, mape, kalendar nedostupnosti, <code>/owner-reports</code></td>
+</tr>
+<tr>
+<td>David Jandrić</td>
+<td>Instruktor, admin</td>
+<td>Kursevi, izveštaji o posetama, loyalty, admin redovi (registracije, recenzije, žalbe, brisanja, penali, direktorijum, prihod)</td>
+</tr>
+</tbody>
+</table>
+<p>Seed lozinka za sve demo naloge: <strong><code>password</code></strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Email</th>
+<th>Uloga</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mail@mail.com</code></td>
+<td>Klijent</td>
+</tr>
+<tr>
+<td><code>zokaMagic@mail.com</code></td>
+<td>Vlasnik bungalova</td>
+</tr>
+<tr>
+<td><code>zokiSumi@mail.com</code></td>
+<td>Vlasnik broda</td>
+</tr>
+<tr>
+<td><code>vesnaVuki@mail.com</code></td>
+<td>Instruktor</td>
+</tr>
+<tr>
+<td><code>admin@admin.com</code></td>
+<td>Admin</td>
+</tr>
+<tr>
+<td><code>pending.owner@mail.com</code></td>
+<td>Registracija na čekanju</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s5">4. Obuhvat</h2>
+<p>U obuhvatu: pregled tri tipa ponuda; JWT prijava; rezervacija/otkazivanje klijenta; životni ciklus ponude vlasnika/instruktora (kreiranje, izmena blokirana dok ima rezervacija, meko brisanje, termini, brze akcije, rezervacija za klijenta); OpenLayers mape; kalendar zauzetosti / nedostupnosti; Chart.js izveštaji; loyalty; kompletan admin hub; dokumenti konkurentnog pristupa; servisni testovi; keš kataloga za PoC skalabilnosti.</p>
+<p>Van obuhvata / poštene granice: produkciono ojačavanje SMTP-a, multi-tenant hosting, savršeno snimanje svakog ugnježđenog admin modala i potpuni ručni prolaz kroz svaki SweetAlert. Živi smoke pokriva <strong>66</strong> API/UI kritičnih provera po ulogama — to je prag verifikacije za ovaj dosije.</p>
+<h2 id="s6">5. Tehnološki stek (sa objašnjenjem)</h2>
+<table>
+<thead>
+<tr>
+<th>Sloj</th>
+<th>Izbor</th>
+<th>Zašto je ovde</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spring Boot 2.5.7</td>
+<td>Kontejner aplikacije</td>
+<td>Stek iz vremena predmeta: ugrađeni Tomcat, auto-config za Web, Security, JPA, Mail</td>
+</tr>
+<tr>
+<td>Spring Web / Data REST</td>
+<td>HTTP površina</td>
+<td>Kontroleri u <code>controllers/</code> izlažu <code>/api/**</code>; SPA je statički</td>
+</tr>
+<tr>
+<td>Spring Security + JWT</td>
+<td>AuthN/Z</td>
+<td>Bezstanјski API: login vraća token; filter čita <code>Authorization</code>; method security po ulozi</td>
+</tr>
+<tr>
+<td>Spring Data JPA / Hibernate</td>
+<td>ORM</td>
+<td>Mapira hijerarhiju <code>User</code> i podtipove <code>Offer</code> na PostgreSQL; <code>@Version</code> za optimističko zaključavanje</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>RDBMS</td>
+<td>Relacioni integritet rezervacija nad terminima; seed preko <code>data-postgres.sql</code></td>
+</tr>
+<tr>
+<td>Spring Mail</td>
+<td>Obaveštenja</td>
+<td>Aktivacija, rezervacija, mejl pretplatnicima; umotan tako da nestali SMTP ne ruši rezervaciju</td>
+</tr>
+<tr>
+<td>Vue 2 CDN SPA</td>
+<td>UI</td>
+<td>Brza isporuka bez Node build pipeline-a; komponente u <code>static/</code></td>
+</tr>
+<tr>
+<td>Vue Router (history)</td>
+<td>Klijentske rute</td>
+<td>Lepši URL-ovi; <code>SpaForwardController</code> prosleđuje nepoznate GET-ove na <code>index.html</code></td>
+</tr>
+<tr>
+<td>Axios</td>
+<td>HTTP klijent</td>
+<td>Kači JWT; govori sa <code>/api</code></td>
+</tr>
+<tr>
+<td>OpenLayers 6</td>
+<td>Mape (ocena 7)</td>
+<td>Mape na detalju ponude iz koordinata <code>Location</code></td>
+</tr>
+<tr>
+<td>Chart.js</td>
+<td>Analitika (ocena 7)</td>
+<td>Grafikoni vlasnika; admin finansije</td>
+</tr>
+<tr>
+<td>Spring Cache <code>@Cacheable</code></td>
+<td>PoC skalabilnosti (ocena 10)</td>
+<td>Catalog <code>findAll</code> za bungalove / brodove / kurseve</td>
+</tr>
+<tr>
+<td>Maven + GHA + Sonar</td>
+<td>DevOps (ocena 9)</td>
+<td>Build, test, statička analiza</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Raspored izvornog koda</strong></p>
+<pre><code class="language-text">src/main/java/com/fishyfinds/isa/
+  controllers/     REST (ponude, korisnici, termini, admin, analitika…)
+  service/         Poslovna pravila (rezervacija, mejl, loyalty…)
+  model/           JPA entiteti + enumi
+  repository/      Spring Data interfejsi
+  security/        JWT filter, TokenUtils
+  config/          Security, keš, SPA forward
+src/main/resources/static/          Vue SPA
+src/main/resources/data-postgres.sql
+docs/concurrent-access/             Ocena 8
+docs/scalability/SCALABILITY_POC.md Ocena 10
+scripts/full-smoke.ps1              Živa verifikacija
+</code></pre>
+<h2 id="s7">6. Arhitektura sistema</h2>
+<figure class="diagram"><img alt="Arhitektura" src="../assets/diagrams/architecture.svg" /><figcaption>Slika 1. Pregledač Vue SPA → Spring Boot (:8080) → kontroleri/servisi → JPA → PostgreSQL. JWT je u <code>localStorage</code> i zaglavlju <code>Authorization</code>. Čitanja kataloga mogu ići preko Spring Cache.</figcaption></figure>
+<figure class="diagram"><img alt="Slučajevi upotrebe" src="../assets/diagrams/use-case.svg" /><figcaption>Slika 2. Podela uloga po trima studentima ISA, plus zajedničke teme ocena 7–10.</figcaption></figure>
+<figure class="diagram"><img alt="Tok rezervacije" src="../assets/diagrams/reservation-flow.svg" /><figcaption>Slika 3. Put rezervacije (klijent ili vlasnik-za-klijenta): kontroler → provere u servisu → optimistički/pesimistički lock → commit → mejl po najboljoj mogućnosti.</figcaption></figure>
+<p>U runtime-u je <strong>jedan JVM</strong>. Nema posebnog Node servera. Statički sadržaj i REST dele origin <code>localhost:8080</code>, što pojednostavljuje CORS za kursni demo.</p>
+<h2 id="s8">7. Domenski model (detalj aplikacije)</h2>
+<p><strong>Korisnici.</strong> <code>User</code> implementira <code>UserDetails</code>. Podtipovi: <code>Customer</code>, <code>BungalowOwner</code>, <code>BoatOwner</code>, <code>Instructor</code>, <code>Admin</code>, uz <code>Authority</code> / status registracije. Oglašivači čekaju admin odobrenje; klijenti se aktiviraju mejl tokenom kada SMTP radi.</p>
+<p><strong>Ponude.</strong> Apstraktni <code>Offer</code> sa <code>Location</code>, <code>ImageItem</code>, <code>AdditionalService</code>, <code>Price</code>. Konkretni tipovi: <code>Bungalow</code>, <code>Boat</code> (sa <code>Engine</code>), <code>Course</code> (veza na instruktora). Meko brisanje i zabrana izmene dok postoje aktivne rezervacije štite inventar.</p>
+<p><strong>Zakazivanje.</strong> <code>Term</code> je rezervabilni prozor na ponudi (<code>@Version</code>). <code>Reservation</code> vezuje klijenta (ili <code>null</code> za <code>ReservationType.QUICK</code>) za termin. <code>CancelledReservation</code> beleži otkazivanja. <code>OfferUnavailability</code> blokira opsege na kalendaru (ocena 7).</p>
+<p><strong>Moderacija i loyalty.</strong> <code>Complaint</code>, <code>UserFeedback</code>, <code>AccountDeletionRequest</code>, <code>Penal</code>, <code>LoyaltyProgram</code>, loyalty redovi po ulozi, <code>VisitReport</code>, <code>Subscriber</code> (praćenje → mejl na brzu akciju).</p>
+<p><strong>Ključna pravila u servisima</strong></p>
+<ul>
+<li>Otkazivanje samo ako rezervacija počinje za <strong>≥ 3 dana</strong>.</li>
+<li><code>createQuickAction</code> pravi brzu rezervaciju i šalje mejl pretplatnicima.</li>
+<li><code>updateBungalow|Boat|Course/{id}</code> odbijen dok postoje aktivne rezervacije.</li>
+<li><code>getTermsByOfferId</code> vraća termine čiji je <code>endTime</code> još u budućnosti (seed prozori pomereni na <strong>2027</strong>).</li>
+<li>Nedostajući <code>Penal</code> red za klijenta se automatski kreira.</li>
+<li>Duplikat <code>DELETE /api/deleteUser/{id}</code> uklonjen; brisanje ostaje na <code>AdminDirectoryController</code>.</li>
+</ul>
+<h2 id="s9">8. Funkcionalna specifikacija po ulozi</h2>
+<p><strong>Gost.</strong> Hero početna; pregled bungalova / brodova / kurseva; detalj (opis, cena, ocena, mapa); registracija; prijava.</p>
+<p><strong>Klijent.</strong> Pretraga/sortiranje; rezervacija slobodnog termina; predstojeće / istorija; otkazivanje uz pravilo 3 dana; feedback; praćenje akcija; žalbe; penali; profil.</p>
+<p><strong>Vlasnik bungalova / broda.</strong> Moje liste sa Details / Terms / Edit / Actions / Book for client / Delete; dodavanje termina; brze akcije; nedostupnost na kalendaru; <code>/owner-reports</code>; visit report gde postoji.</p>
+<p><strong>Instruktor.</strong> Isti obrazac na kursevima (<code>/my-courses</code>).</p>
+<p><strong>Admin.</strong> Tile dashboard: registracije, žalbe, recenzije, brisanja, penali, direktorijum, registracija admina, loyalty, prihod / sistemski udeo.</p>
+<h2 id="s10">9. Lestvica ocena (ISA 6 → 10)</h2>
+<table>
+<thead>
+<tr>
+<th>Ocena</th>
+<th>Očekivanje</th>
+<th>Šta je u ovom stablu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>6</strong></td>
+<td>Jezgro marketplace-a</td>
+<td>Terms UI za sve tipove; <code>POST /api/createQuickAction</code> + mejl; <code>PUT</code> update; book-for-client; soft-delete</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>Mape, grafikoni, kalendar, loyalty</td>
+<td>OpenLayers; Chart.js; <code>OfferUnavailability</code>; <code>/admin-loyalty</code></td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td>Konkurentni pristup</td>
+<td>PDF-ovi u <code>docs/concurrent-access/</code>; <code>@Version</code> + lock-ovi</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td>DevOps + testovi</td>
+<td>GitHub Actions, SonarCloud; Mockito testovi</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>Skalabilnost</td>
+<td><code>SCALABILITY_POC.md</code>; <code>@Cacheable</code> na catalog <code>findAll</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s11">10. Korisnički interfejs (živi snimci)</h2>
+<p>Snimci sa lokalne aplikacije 9. septembra 2026. Fajlovi: <a href="../screenshots/"><code>../screenshots/</code></a>.</p>
+<h3>10.1 Gost i klijent</h3>
+<figure class="shot"><img alt="Početna gosta" src="../screenshots/01-guest-home.png" /><figcaption>Slika 4. Početna gosta — hero luke, brend </em><em>FISHYFINDS</em><em>, CTA za bungalove / brodove / kurseve, REGISTER i SIGN IN.</figcaption></figure>
+<figure class="shot"><img alt="Katalog bungalova" src="../screenshots/02-bungalows.png" /><figcaption>Slika 5. Javni katalog bungalova — kartice sa fotografijom, cenom, ocenom, lokacijom.</figcaption></figure>
+<figure class="shot"><img alt="Prijava" src="../screenshots/03-sign-in.png" /><figcaption>Slika 6. Prijava — JWT login; demo lozinka <code>password</code>.</figcaption></figure>
+<figure class="shot"><img alt="Katalog brodova" src="../screenshots/13-boats-catalog.png" /><figcaption>Slika 7. Katalog brodova — isti obrazac kartica.</figcaption></figure>
+<figure class="shot"><img alt="Katalog kurseva" src="../screenshots/14-courses-catalog.png" /><figcaption>Slika 8. Katalog kurseva — kursevi sa instruktorom.</figcaption></figure>
+<figure class="shot"><img alt="Rezervacija" src="../screenshots/04-make-reservation.png" /><figcaption>Slika 9. UI rezervacije — izbor slobodnog termina i potvrda.</figcaption></figure>
+<figure class="shot"><img alt="Predstojeće rezervacije" src="../screenshots/05-upcoming.png" /><figcaption>Slika 10. Predstojeće rezervacije klijenta — otkazivanje uz pravilo ≥3 dana.</figcaption></figure>
+<h3>10.2 Vlasnici i instruktor</h3>
+<figure class="shot"><img alt="Moji bungalovi" src="../screenshots/06-owner-bungalows.png" /><figcaption>Slika 11. Moji bungalovi — pretraga, ADD BUNGALOW, i dugmad Details / Terms / Edit / Actions / Book for client / Delete.</figcaption></figure>
+<figure class="shot"><img alt="Moji brodovi" src="../screenshots/15-my-boats.png" /><figcaption>Slika 12. Moji brodovi — paritet sa upravljanjem bungalovima.</figcaption></figure>
+<figure class="shot"><img alt="Moji kursevi" src="../screenshots/16-my-courses.png" /><figcaption>Slika 13. Moji kursevi (instruktor) — CRUD i isti alati termina/akcija.</figcaption></figure>
+<figure class="shot"><img alt="Kalendar vlasnika" src="../screenshots/07-owner-calendar.png" /><figcaption>Slika 14. Kalendar vlasnika — zauzetost i blokade <code>OfferUnavailability</code>.</figcaption></figure>
+<figure class="shot"><img alt="Izveštaji vlasnika" src="../screenshots/08-owner-reports.png" /><figcaption>Slika 15. Izveštaji vlasnika — Chart.js poslovni grafikoni.</figcaption></figure>
+<h3>10.3 Admin</h3>
+<figure class="shot"><img alt="Admin početna" src="../screenshots/09-admin-home.png" /><figcaption>Slika 16. Admin dashboard — tile hub za sve redove moderacije i finansije.</figcaption></figure>
+<figure class="shot"><img alt="Admin registracije" src="../screenshots/10-admin-registrations.png" /><figcaption>Slika 17. Red registracija — odobri ili odbij oglašivača.</figcaption></figure>
+<figure class="shot"><img alt="Admin žalbe" src="../screenshots/11-admin-complaints.png" /><figcaption>Slika 18. Red žalbi — rešavanje uz mogući mejl odluke.</figcaption></figure>
+<figure class="shot"><img alt="Admin prihod" src="../screenshots/12-admin-income.png" /><figcaption>Slika 19. Prihod / sistemski udeo.</figcaption></figure>
+<figure class="shot"><img alt="Admin loyalty" src="../screenshots/17-admin-loyalty.png" /><figcaption>Slika 20. Loyalty program — kategorije i stope (ocena 7).</figcaption></figure>
+<h2 id="s12">11. Bezbednost, mejl i podaci</h2>
+<ul>
+<li>Lozinke sa heširanjem Spring Security; autorizacija JWT + provera uloga.</li>
+<li>Registracija oglašivača ostaje <code>PENDING</code> do admin odobrenja.</li>
+<li>Mejl je <strong>best-effort</strong>: uspeh rezervacije ne zavisi od SMTP-a.</li>
+<li>Demo šema: <code>create-drop</code> + <code>data-postgres.sql</code>. Termini u seed-u su u <strong>2027</strong>. <code>setval</code> na sekvencama sprečava sudar PK za loyalty/penal.</li>
+</ul>
+<h2 id="s13">12. Konkurentnost, testovi i skalabilnost</h2>
+<p><strong>Konkurentnost (ocena 8).</strong> Optimistički <code>@Version</code> na <code>Term</code> / <code>Reservation</code>; pesimistički lock na klijenta gde treba. Opisi: <code>docs/concurrent-access/</code>.</p>
+<p><strong>Testovi (ocena 9).</strong> Mockito pokriće servisa; <code>./mvnw test</code> na JDK 17 zelen. Živa regresija: <code>scripts/full-smoke.ps1</code> (66 provera).</p>
+<p><strong>Skalabilnost (ocena 10).</strong> Pisani PoC (particije, replike, LB, keš). U kodu: <code>@Cacheable</code> na catalog <code>findAll</code>.</p>
+<h2 id="s14">13. Build i pokretanje (provera 2026)</h2>
+<pre><code class="language-text"># PostgreSQL: baza fishyfinds_db (podrazumevano root/root;
+# override DB_USERNAME / DB_PASSWORD — ne commit-ovati tajne)
+
+./mvnw spring-boot:run
+# otvoriti http://localhost:8080
+
+./mvnw test
+powershell -File scripts/full-smoke.ps1
+powershell -File scripts/capture-screenshots.ps1
+</code></pre>
+<p>Preporučen JDK <strong>17+</strong>. Aplikacija služi SPA i API na portu <strong>8080</strong>.</p>
+<h2 id="s15">14. Rezime</h2>
+<p>FishyFinds je arhiva ISA tima 2021/22: Spring Boot + Vue 2 + PostgreSQL marketplace za bungalove, brodove i ribolovne kurseve, sa jasnom podelom uloga na tri studenta, JWT bezbednošću, admin moderacijom, mapama/grafikonima/kalendarom/loyalty-jem, dokumentacijom konkurentnog pristupa, automatskim testovima/CI i beleškom o skalabilnosti uz keš kataloga. Provereno lokalno 9. septembra 2026. sa <strong>66/66</strong> smoke proverama i zelenim Maven testovima. Ovaj dosije ima englesko i srpsko (latinica) izdanje za usmenu odbranu i kasnije obnove arhive.</p>
+<h2 id="s16">15. Povezani dokumenti</h2>
+<table>
+<thead>
+<tr>
+<th>Dokument</th>
+<th>Putanja</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Engleski dosije</td>
+<td><a href="DOSSIER_EN.md">DOSSIER_EN.md</a></td>
+</tr>
+<tr>
+<td>Interaktivni HTML</td>
+<td><a href="dossier.html">dossier.html</a></td>
+</tr>
+<tr>
+<td>Konkurentni pristup</td>
+<td><code>../concurrent-access/</code></td>
+</tr>
+<tr>
+<td>PoC skalabilnosti</td>
+<td><code>../scalability/SCALABILITY_POC.md</code></td>
+</tr>
+<tr>
+<td>Snimci ekrana</td>
+<td><code>../screenshots/</code></td>
+</tr>
+<tr>
+<td>Dijagrami</td>
+<td><code>../assets/diagrams/</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>FishyFinds ISA tehnički dosije — srpsko izdanje.</em></p></section>
+  </main>
+  <script>
+    function setLang(l) {
+      document.getElementById('lang-en').classList.toggle('show', l === 'en');
+      document.getElementById('lang-sr').classList.toggle('show', l === 'sr');
+      document.getElementById('lang-en').classList.toggle('print-show', l === 'en');
+      document.getElementById('lang-sr').classList.toggle('print-show', l === 'sr');
+      document.getElementById('btn-en').classList.toggle('active', l === 'en');
+      document.getElementById('btn-sr').classList.toggle('active', l === 'sr');
+    }
+  </script>
+</body>
+</html>

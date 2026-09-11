@@ -1,86 +1,67 @@
 Vue.component('actions', {
 data: function(){
     		return{
+    		    offerId: '',
     		    loggedUser: {
                    userType:''
                 },
-    			showPage: 0,
     			sortOption: "",
     			reservations:[],
     		}
     	},
     template: `
-    	<div>
+    	<div class="ff-catalog">
     		<nav-bar></nav-bar>
-    		<br>
-    		<br>
-            <div class="my-bungalows">
-    			<div class="col-md-4 left-div overflow-auto" style="margin-top:-20px; margin-left: 22%; height:80vh">
-    				<form class="justify-content-center">
-    					<table class="justify-content-center" style="width:90%; margin-left:5%; table-layout:fixed;" >
-    						<br>
-    						<tr>
-    							<td colspan="2">
-    								<select v-model="sortOption" class="select-sort" name="select" id="format">
-    									<option selected disabled>Sort by</option>
-    									<option value="AscPrice">Sort by total price: low to high</option>
-    									<option value="DescPrice">Sort by total price: high to low</option>
-    									<option value="AscDuration">Sort by duration (asc)</option>
-                                        <option value="DescDuration">Sort by duration (desc)</option>
-                                        <option value="AscStart">Sort by start date (asc)</option>
-                                        <option value="DescStart">Sort by start date (desc)</option>
-                                        <option value="AscEnd">Sort by end date (asc)</option>
-                                        <option value="DescEnd">Sort by end date (desc)</option>
-    								</select>
-    							</td>
-    							<tr>
-    							    <td><input class="confirm-profile" type="button" style="background-color: #1b4560; font-size: 15px;" value="Sort" @click="sortedArray"/></td>
-    							</tr>
-    						</tr>
-    					</table>
-    				</form>
-    				<div class="container mt-5">
-    					<div class="card mb-3" style="width: 96%; margin-left:2%; background-color:#225779;" v-for="reservation in reservations">
-    						<div class="row g-0">
-    							<div class="col-md-4" style="text-align:center;">
-    								<img :src="reservation.path" class="img-fluid rounded" style="margin:0 auto;"alt="James Bond's Bungalow">
-    							</div>
-    							<div class="col-md-8">
-    								<div class="card-body">
-    								    <h5 class="card-title text-start mt-3" style="color:#fff;font-family:poppins-bold; font-size:15px;">{{reservation.startDate}} - {{reservation.endDate}}</h5>
-    									<h5 class="card-title text-start mt-3" style="color:#fff;font-family:poppins-bold; font-size:15px;">{{reservation.offer.offerName}}</h5>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">{{reservation.offer.description}}</p>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Number of people: {{reservation.numberOfPeople}}</p>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Unit price: {{reservation.offer.unitPrice}}</p>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Total price: {{reservation.totalPrice}}</p>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Discount: {{reservation.discount}}</p>
-    									<p class="card-text line-clamp-2" style="color:#fff;font-family:poppins-light; font-size:12px;">Rating: {{reservation.offer.rating}}</p>
-    									<button v-show="loggedUser.userType == 'CUSTOMER'" class="float-end btn btn-light" style="margin-right:2.5%;" @click="makeReservation(reservation)">Book!</button>
-    								</div>
-    							</div>
-    						</div>
-    					</div>
-    				</div>
-               	</div>
-            </div>
+            <section class="ff-catalog__shell">
+                <div class="ff-section-head">
+                    <h2>Special actions</h2>
+                    <p>Discounted terms for this offer. Customers can book directly.</p>
+                </div>
+                <div class="ff-filters">
+                    <div class="ff-filters__row ff-filters__row--tight">
+                        <label class="ff-control">
+                            <span>Sort actions</span>
+                            <select v-model="sortOption" class="ff-field" @change="sortedArray">
+                                <option disabled value="">Choose order</option>
+                                <option value="AscPrice">Total price up</option>
+                                <option value="DescPrice">Total price down</option>
+                                <option value="AscDuration">Duration up</option>
+                                <option value="DescDuration">Duration down</option>
+                                <option value="AscStart">Start up</option>
+                                <option value="DescStart">Start down</option>
+                                <option value="AscEnd">End up</option>
+                                <option value="DescEnd">End down</option>
+                            </select>
+                        </label>
+                    </div>
+                    <p class="ff-filters__hint">Sorting applies immediately when you pick an option.</p>
+                </div>
+                <div class="ff-product-grid">
+                    <article class="ff-product" v-for="reservation in reservations" :key="reservation.id">
+                        <div class="ff-product__media">
+                            <img :src="reservation.path || 'images/no-pictures.jpg'" :alt="reservation.offer && reservation.offer.offerName">
+                        </div>
+                        <div class="ff-product__body">
+                            <h3>{{ reservation.offer && reservation.offer.offerName }}</h3>
+                            <p class="ff-product__meta">{{ reservation.startDate }} - {{ reservation.endDate }}</p>
+                            <p>{{ reservation.offer && reservation.offer.description }}</p>
+                            <p class="ff-product__meta">People: {{ reservation.numberOfPeople }} | Total: {{ reservation.totalPrice }} | Discount: {{ reservation.discount }}</p>
+                            <div class="ff-product__actions" v-if="loggedUser.userType == 'CUSTOMER'">
+                                <button class="ff-btn ff-btn--primary" type="button" @click="makeReservation(reservation)">Book</button>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+                <p v-if="!reservations.length" class="ff-empty">No special actions for this offer.</p>
+            </section>
     	</div>
     		`
           ,
-          computed: {
-              axiosParams() {
-                  const params = new URLSearchParams();
-                  params.append('name', this.searchParams.bungalowName);
-                  params.append('location', this.searchParams.bungalowLocation);
-                  params.append('type', 'BUNGALOW');
-                  return params;
-              }
-          }
-          ,
           methods : {
-            search : function(){
-                axios.get('/api/search', {
-                     params: this.axiosParams
-                }).then(response => (this.bungalows = response.data))
+            reloadActions : function(){
+                axios.defaults.headers.common["Authorization"] = localStorage.getItem("user");
+                axios.post("/api/getActionsForOffer", {"id" : this.offerId})
+                     .then((response) => { this.reservations = response.data || []; });
             },
             makeReservation : function(reservation){
             axios.defaults.headers.common["Authorization"] =
@@ -88,110 +69,49 @@ data: function(){
                 axios.post("/api/makeReservationAction",{"id" : reservation.id})
                      .then((response)=>{
                         if(response.data){
-                           axios.defaults.headers.common["Authorization"] =
-                                                                       localStorage.getItem("user");
-                                       axios.post("/api/getActionsForOffer", {"id" : id})
-                                            .then((response) => {this.reservations = response.data})
+                           Swal.fire('Booked successfully!', '', 'success');
+                           this.reloadActions();
                         }else{
-                            Swal.fire('Ooops, something went wrong!',
-                	                  'Please, try again later',
-                	                  'error')
+                            Swal.fire('Something went wrong!', 'Please try again later.', 'error')
                         }
                      })
+                     .catch(() => Swal.fire('Something went wrong!', 'Please try again later.', 'error'))
             },
             sortedArray: function() {
                     if(this.sortOption === 'DescPrice'){
-                       function compare(a, b) {
-                         if (a.totalPrice > b.totalPrice)
-                           return -1;
-                         if (a.totalPrice < b.totalPrice)
-                           return 1;
-                        return 0;
-                      }
-                       return this.reservations.sort(compare);
+                       return this.reservations.sort((a, b) => b.totalPrice - a.totalPrice);
                    }
                     if(this.sortOption === 'AscPrice'){
-                        function compare(a, b) {
-                            if (a.totalPrice < b.totalPrice)
-                               return -1;
-                            if (a.totalPrice > b.totalPrice)
-                               return 1;
-                            return 0;
-                        }
-                        return this.reservations.sort(compare);
+                        return this.reservations.sort((a, b) => a.totalPrice - b.totalPrice);
                     }
                     if(this.sortOption === 'DescDuration'){
-                       function compare(a, b) {
-                         if (a.duration > b.duration)
-                           return -1;
-                         if (a.duration < b.duration)
-                           return 1;
-                        return 0;
-                      }
-                       return this.reservations.sort(compare);
+                       return this.reservations.sort((a, b) => b.duration - a.duration);
                    }
                     if(this.sortOption === 'AscDuration'){
-                        function compare(a, b) {
-                            if (a.duration < b.duration)
-                               return -1;
-                            if (a.duration > b.duration)
-                               return 1;
-                            return 0;
-                        }
-                        return this.reservations.sort(compare);
+                        return this.reservations.sort((a, b) => a.duration - b.duration);
                     }
                     if(this.sortOption === 'DescStart'){
-                       function compare(a, b) {
-                         if (a.startDate > b.startDate)
-                           return -1;
-                         if (a.startDate < b.startDate)
-                           return 1;
-                        return 0;
-                      }
-                       return this.reservations.sort(compare);
+                       return this.reservations.sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
                    }
                     if(this.sortOption === 'AscStart'){
-                        function compare(a, b) {
-                            if (a.startDate < b.startDate)
-                               return -1;
-                            if (a.startDate > b.startDate)
-                               return 1;
-                            return 0;
-                        }
-                        return this.reservations.sort(compare);
+                        return this.reservations.sort((a, b) => (a.startDate > b.startDate ? 1 : -1));
                     }
                     if(this.sortOption === 'DescEnd'){
-                       function compare(a, b) {
-                         if (a.endDate > b.endDate)
-                           return -1;
-                         if (a.endDate < b.endDate)
-                           return 1;
-                        return 0;
-                      }
-                       return this.reservations.sort(compare);
+                       return this.reservations.sort((a, b) => (a.endDate < b.endDate ? 1 : -1));
                    }
                     if(this.sortOption === 'AscEnd'){
-                        function compare(a, b) {
-                            if (a.endDate < b.endDate)
-                               return -1;
-                            if (a.endDate > b.endDate)
-                               return 1;
-                            return 0;
-                        }
-                        return this.reservations.sort(compare);
+                        return this.reservations.sort((a, b) => (a.endDate > b.endDate ? 1 : -1));
                     }
              }
           },
         mounted(){
-            const id = window.location.hash.split('/')[2];
-            axios.defaults.headers.common["Authorization"] =
-                                            localStorage.getItem("user");
-            axios.post("/api/getActionsForOffer", {"id" : id})
-                 .then((response) => {this.reservations = response.data;
-                  axios.defaults.headers.common["Authorization"] =
-                                                                  localStorage.getItem("user");
-                                             axios.get("/api/authenticateUser")
-                                                 .then(response => this.loggedUser = response.data);})
+            this.offerId = (this.$route && this.$route.params && this.$route.params.id)
+                || (window.location.pathname.split('/').filter(Boolean).pop());
+            this.reloadActions();
+            axios.defaults.headers.common["Authorization"] = localStorage.getItem("user");
+            axios.get("/api/authenticateUser")
+                 .then(response => this.loggedUser = response.data || { userType: '' })
+                 .catch(() => this.loggedUser = { userType: '' });
         }
 
 });

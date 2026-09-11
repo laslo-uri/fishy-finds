@@ -5,7 +5,7 @@ import com.fishyfinds.isa.model.beans.users.UserTokenState;
 import com.fishyfinds.isa.security.TokenUtils;
 import com.fishyfinds.isa.security.auth.JwtAuthenticationRequest;
 import com.fishyfinds.isa.service.AuthenticationService;
-import com.fishyfinds.isa.service.usersService.CustomUserDetailsService;
+import com.fishyfinds.isa.service.users.CustomUserDetailsService;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

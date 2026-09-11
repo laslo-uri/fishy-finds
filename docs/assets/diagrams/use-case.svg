@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620">
+  <rect width="960" height="620" fill="#fafafa"/>
+  <style>
+    .t { font-family: 'Segoe UI', Calibri, sans-serif; fill: #1a1a1a; }
+    .h { font-family: 'Segoe UI', Calibri, sans-serif; fill: #1a1a1a; font-weight: 600; }
+    .s { font-family: 'Segoe UI', Calibri, sans-serif; fill: #5a5a5a; }
+    .w { font-family: 'Segoe UI', Calibri, sans-serif; fill: #fff; font-weight: 600; }
+  </style>
+  <text x="40" y="28" class="h" font-size="16">Use cases by role (ISA team split)</text>
+  <text x="40" y="48" class="s" font-size="11">Natalija � Guest/Customer  �  Laslo � Bungalow/Boat owner  �  David � Instructor/Admin</text>
+
+  <!-- Guest / Customer -->
+  <rect x="40" y="72" width="280" height="240" rx="6" fill="#fff" stroke="#ed1c24" stroke-width="1.5"/>
+  <rect x="40" y="72" width="280" height="36" rx="6" fill="#ed1c24"/>
+  <rect x="40" y="90" width="280" height="18" fill="#ed1c24"/>
+  <text x="180" y="96" class="w" font-size="13" text-anchor="middle">Guest / Customer</text>
+  <text x="56" y="130" class="t" font-size="12">Browse catalogs (bungalow/boat/course)</text>
+  <text x="56" y="152" class="t" font-size="12">Register + email activation</text>
+  <text x="56" y="174" class="t" font-size="12">Search, sort, filter offers</text>
+  <text x="56" y="196" class="t" font-size="12">Book / cancel (e3 days)</text>
+  <text x="56" y="218" class="t" font-size="12">History, feedback, follow actions</text>
+  <text x="56" y="240" class="t" font-size="12">Complaints, penalties, profile</text>
+  <text x="56" y="270" class="s" font-size="11">Student 1  Natalija Simin</text>
+
+  <!-- Owners -->
+  <rect x="340" y="72" width="280" height="240" rx="6" fill="#fff" stroke="#2f6aa0" stroke-width="1.5"/>
+  <rect x="340" y="72" width="280" height="36" rx="6" fill="#2f6aa0"/>
+  <rect x="340" y="90" width="280" height="18" fill="#2f6aa0"/>
+  <text x="480" y="96" class="w" font-size="13" text-anchor="middle">Bungalow / Boat owner</text>
+  <text x="356" y="130" class="t" font-size="12">CRUD offers + images</text>
+  <text x="356" y="152" class="t" font-size="12">Manage terms / availability</text>
+  <text x="356" y="174" class="t" font-size="12">Quick actions + subscriber mail</text>
+  <text x="356" y="196" class="t" font-size="12">Book for client</text>
+  <text x="356" y="218" class="t" font-size="12">Occupancy calendar + maps</text>
+  <text x="356" y="240" class="t" font-size="12">Business charts (/owner-reports)</text>
+  <text x="356" y="270" class="s" font-size="11">Student 2  Laslo Uri</text>
+
+  <!-- Instructor / Admin -->
+  <rect x="640" y="72" width="280" height="240" rx="6" fill="#fff" stroke="#3e7a55" stroke-width="1.5"/>
+  <rect x="640" y="72" width="280" height="36" rx="6" fill="#3e7a55"/>
+  <rect x="640" y="90" width="280" height="18" fill="#3e7a55"/>
+  <text x="780" y="96" class="w" font-size="13" text-anchor="middle">Instructor / Admin</text>
+  <text x="656" y="130" class="t" font-size="12">Course CRUD + terms</text>
+  <text x="656" y="152" class="t" font-size="12">Visit reports + calendar</text>
+  <text x="656" y="174" class="t" font-size="12">Loyalty program config</text>
+  <text x="656" y="196" class="t" font-size="12">Registrations / reviews / complaints</text>
+  <text x="656" y="218" class="t" font-size="12">Deletions, penalties, directory</text>
+  <text x="656" y="240" class="t" font-size="12">System income / cut</text>
+  <text x="656" y="270" class="s" font-size="11">Student 3  David Jandri</text>
+
+  <rect x="40" y="340" width="880" height="240" rx="6" fill="#fff" stroke="#c9a227" stroke-width="1.5"/>
+  <rect x="40" y="340" width="880" height="36" rx="6" fill="#c9a227"/>
+  <rect x="40" y="358" width="880" height="18" fill="#c9a227"/>
+  <text x="480" y="364" class="w" font-size="13" text-anchor="middle">Cross-cutting (grades 710)</text>
+  <text x="56" y="400" class="t" font-size="12">OpenLayers maps on offer details � Chart.js owner/admin analytics � OfferUnavailability calendar blocks</text>
+  <text x="56" y="428" class="t" font-size="12">Concurrent booking: @Version on Term/Reservation + pessimistic customer lock (docs/concurrent-access/)</text>
+  <text x="56" y="456" class="t" font-size="12">DevOps: Maven, GitHub Actions, SonarCloud � JUnit 5 + Mockito service tests</text>
+  <text x="56" y="484" class="t" font-size="12">Scalability PoC: catalog @Cacheable, partitioning / replicas / LB notes (docs/scalability/)</text>
+  <text x="56" y="520" class="s" font-size="11">Platform shared by all three students; each owns the role surfaces above for the ISA defense.</text>
+  <text x="56" y="548" class="s" font-size="11">Demo password for all seed accounts: password</text>
+</svg>

@@ -110,6 +110,14 @@
             <scope>compile</scope>
         </dependency>
 
+		<dependency>
+			<groupId>javaxt</groupId>
+			<artifactId>javaxt-core</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/javaxt-core.jar</systemPath>
+		</dependency>
+
     </dependencies>
 
 	<build>

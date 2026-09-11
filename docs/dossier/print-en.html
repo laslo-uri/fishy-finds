@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Technical Dossier — FishyFinds (EN)</title>
+<style>
+:root {
+  --ink: #1a1a1a;
+  --muted: #5a5a5a;
+  --line: #e8e0e0;
+  --accent: #ed1c24;
+  --coral: #c41218;
+  --gold: #c9a227;
+  --sage: #3e7a55;
+  --sky: #2f6aa0;
+  --cream: #fafafa;
+  --soft: #fde8e9;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; padding: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: Cambria, Constantia, "Times New Roman", serif;
+  font-size: 10.5pt;
+  line-height: 1.5;
+  font-variant-ligatures: none;
+}
+.page-footer {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  height: 8mm; padding: 2mm 1mm 0 1mm;
+  border-top: 2.2pt solid #e8b84a;
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 7.4pt;
+  color: #fff;
+  display: flex; justify-content: space-between; gap: 8pt;
+  background: linear-gradient(90deg, #ed1c24 0%, #c41218 70%, #8a1014 100%);
+  z-index: 10;
+}
+.page-footer span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.shell { width: 100%; border-collapse: collapse; }
+.shell > thead > tr > td,
+.shell > tbody > tr > td,
+.shell > tfoot > tr > td {
+  border: 0 !important; background: transparent !important;
+  padding: 0 !important; margin: 0; vertical-align: top;
+}
+.shell > thead { display: table-header-group; }
+.shell > tfoot { display: table-footer-group; }
+.foot-space { height: 12mm; }
+.wrap { padding: 0 2mm; }
+
+.cover { page-break-after: always; break-after: page; padding: 0 0 4mm 0; }
+.cover-hero {
+  background: linear-gradient(135deg, #ed1c24 0%, #c41218 55%, #8a1014 100%);
+  color: #fff; padding: 16mm 12mm 14mm 12mm; margin: 0 0 12mm 0;
+  border-radius: 0 0 10pt 10pt;
+}
+.cover-kicker {
+  font-family: Calibri, "Segoe UI", sans-serif; font-size: 9pt; color: #fde8e9; margin: 0 0 10mm 0;
+}
+.cover h1 {
+  page-break-before: auto !important; break-before: auto !important;
+  font-family: "Calibri Light", Calibri, "Segoe UI", sans-serif;
+  font-weight: 300; font-size: 28pt; letter-spacing: -0.3pt; color: #fff;
+  margin: 0 0 4pt 0; border: 0; padding: 0;
+}
+.cover-rule {
+  width: 28mm; height: 3pt; background: #e8b84a;
+  margin: 8mm 0 0 0; border-radius: 2pt;
+}
+.cover-body { padding: 0 6mm; }
+.cover-product {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 18pt; font-weight: 700; color: var(--accent); margin: 0 0 2pt 0;
+}
+.cover-english {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 12pt; color: var(--sky); margin: 0 0 6pt 0;
+}
+.cover-version {
+  display: inline-block;
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 9.5pt; color: #fff; background: var(--coral);
+  padding: 4pt 10pt; border-radius: 10pt; margin: 0 0 8mm 0; line-height: 1.4;
+}
+.cover-lede { font-size: 12pt; max-width: 155mm; margin: 0 0 10mm 0; }
+.cover-meta {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 10.5pt; color: var(--muted);
+}
+.cover-meta p { margin: 0.15em 0; }
+.people { display: flex; flex-wrap: wrap; gap: 6mm; margin-top: 8mm; }
+.person {
+  min-width: 55mm; padding: 8pt 12pt; border-radius: 6pt;
+  background: var(--soft); border-left: 4pt solid var(--accent);
+}
+.person.alt { background: #eef3f8; border-left-color: var(--sky); }
+.person.alt2 { background: #eef6f0; border-left-color: var(--sage); }
+.pname {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 12pt; font-weight: 600;
+}
+.pmeta { font-size: 9.5pt; color: var(--muted); margin: 1pt 0 0 0; }
+.cover-inst {
+  margin-top: 10mm;
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 10pt; color: var(--muted);
+}
+
+.toc-page { page-break-after: always; break-after: page; padding: 4mm 0 0 0; }
+.toc-page > h1 {
+  page-break-before: auto !important; break-before: auto !important;
+  font-family: "Calibri Light", Calibri, sans-serif;
+  font-weight: 300; font-size: 24pt; border: 0; margin: 0 0 4mm 0; padding: 0;
+  color: var(--accent);
+}
+.toc-page > h1:after {
+  content: ""; display: block; width: 28mm; height: 3pt;
+  background: var(--coral); margin-top: 6pt; border-radius: 2pt;
+}
+.toc { list-style: none; margin: 4pt 0 0 0; padding: 0; counter-reset: toc; }
+.toc li { margin: 0; counter-increment: toc; page-break-inside: avoid; }
+.toc li:nth-child(odd) a { background: #faf3f3; }
+.toc a {
+  display: block; padding: 3.6pt 8pt; border-left: 3.5pt solid var(--accent);
+  text-decoration: none; color: var(--ink);
+  font-family: Calibri, "Segoe UI", sans-serif; font-size: 10pt;
+}
+.toc a::before {
+  content: counter(toc, decimal-leading-zero);
+  color: var(--coral); font-weight: 700; font-size: 9.5pt; margin-right: 8pt;
+}
+.toc li:nth-child(3n) a { border-left-color: var(--gold); }
+.toc li:nth-child(3n+2) a { border-left-color: var(--sky); }
+
+h1, h2 {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 13pt; font-weight: 600; color: var(--accent);
+  margin: 16pt 0 7pt 0; page-break-after: avoid;
+  padding-left: 8pt; border-left: 3.5pt solid var(--coral);
+}
+h3 {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 11pt; font-weight: 600; color: var(--sky);
+  margin: 12pt 0 5pt 0; page-break-after: avoid;
+}
+p { margin: 0 0 8pt 0; }
+ul, ol { margin: 0 0 10pt 0; padding-left: 18pt; }
+li { margin: 0 0 3pt 0; }
+table {
+  width: 100%; border-collapse: collapse; margin: 0 0 12pt 0;
+  font-size: 9.5pt; page-break-inside: avoid;
+}
+th, td {
+  border: 1pt solid var(--line); padding: 4pt 6pt; text-align: left; vertical-align: top;
+}
+th { background: var(--soft); color: var(--ink); font-family: Calibri, sans-serif; }
+code, pre {
+  font-family: Consolas, "Cascadia Mono", monospace; font-size: 8.5pt;
+}
+pre {
+  background: #f6f6f6; border: 1pt solid var(--line); padding: 8pt;
+  overflow: hidden; white-space: pre-wrap; page-break-inside: avoid;
+}
+figure {
+  margin: 10pt 0 14pt 0; padding: 0; page-break-inside: avoid;
+  border: 1pt solid var(--line); background: #fff;
+}
+figure img { display: block; width: 100%; height: auto; }
+figure.diagram img { max-height: 140mm; object-fit: contain; background: #fafafa; }
+figcaption {
+  font-family: Calibri, "Segoe UI", sans-serif;
+  font-size: 9pt; color: var(--muted);
+  padding: 6pt 8pt; border-top: 1pt solid var(--line); background: #fcfcfc;
+}
+strong { font-weight: 700; }
+a { color: var(--coral); }
+@media print {
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+<div class="page-footer">
+  <span>Technical Dossier — FishyFinds</span>
+  <span>ISA FTN UNS  |  2021/22  |  EN</span>
+</div>
+<table class="shell">
+<thead><tr><td></td></tr></thead>
+<tfoot><tr><td><div class="foot-space"></div></td></tr></tfoot>
+<tbody><tr><td>
+<section class="cover">
+  <div class="cover-hero">
+    <p class="cover-kicker">Faculty of Technical Sciences, University of Novi Sad</p>
+    <h1>Technical Dossier</h1>
+    <div class="cover-rule"></div>
+  </div>
+  <div class="cover-body">
+    <p class="cover-product">FishyFinds</p>
+    <p class="cover-english">Internet Software Architectures (ISA) · 2021/22</p>
+    <p class="cover-version">Dossier 1.0.0  ·  verified 9 September 2026  ·  smoke 66/66</p>
+    <p class="cover-lede">Full technical write-up of the fishing-tourism marketplace: purpose of the subject and project, stack, architecture, domain rules, role UI with annotated screenshots, concurrency, tests, scalability, and summary.</p>
+    <div class="cover-meta"><p>Spring Boot 2.5.7 + Vue 2 + PostgreSQL</p><p>Local: http://localhost:8080</p></div>
+    <div class="people">
+      <div class="person"><div class="pname">Natalija Simin</div><div class="pmeta">Guest / Customer</div></div>
+      <div class="person alt"><div class="pname">Laslo Uri</div><div class="pmeta">Bungalow / Boat owner</div></div>
+      <div class="person alt2"><div class="pname">David Jandrić</div><div class="pmeta">Instructor / Admin</div></div>
+    </div>
+    <p class="cover-inst">Computing and Control Engineering</p>
+  </div>
+</section>
+<nav class="toc-page">
+  <h1>Contents</h1>
+  <ol class="toc">
+<li><a href="#s1"><span class="toc-title">Document control</span></a></li>
+<li><a href="#s2"><span class="toc-title">1. Purpose of the subject</span></a></li>
+<li><a href="#s3"><span class="toc-title">2. Purpose of the project</span></a></li>
+<li><a href="#s4"><span class="toc-title">3. Identification</span></a></li>
+<li><a href="#s5"><span class="toc-title">4. Scope</span></a></li>
+<li><a href="#s6"><span class="toc-title">5. Technology stack (explained)</span></a></li>
+<li><a href="#s7"><span class="toc-title">6. System architecture</span></a></li>
+<li><a href="#s8"><span class="toc-title">7. Domain model (application detail)</span></a></li>
+<li><a href="#s9"><span class="toc-title">8. Functional specification by role</span></a></li>
+<li><a href="#s10"><span class="toc-title">9. Grade ladder (ISA 6 → 10)</span></a></li>
+<li><a href="#s11"><span class="toc-title">10. User interface (live captures)</span></a></li>
+<li><a href="#s12"><span class="toc-title">11. Security, mail, and data</span></a></li>
+<li><a href="#s13"><span class="toc-title">12. Concurrency, tests, and scalability</span></a></li>
+<li><a href="#s14"><span class="toc-title">13. Build and run (2026 check)</span></a></li>
+<li><a href="#s15"><span class="toc-title">14. Summary</span></a></li>
+<li><a href="#s16"><span class="toc-title">15. Related documents</span></a></li>
+</ol>
+</nav>
+<div class="wrap">
+<h2 id="s1">Document control</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Title</td>
+<td>Technical Dossier, FishyFinds (ISA)</td>
+</tr>
+<tr>
+<td>Dossier version</td>
+<td>1.0.0</td>
+</tr>
+<tr>
+<td>Software</td>
+<td>FishyFinds / artifact <code>com.fishyfinds:isa</code> <code>0.0.1-SNAPSHOT</code></td>
+</tr>
+<tr>
+<td>Course</td>
+<td>Internet Software Architectures (ISA), FTN UNS, 2021/22</td>
+</tr>
+<tr>
+<td>Compiled</td>
+<td>9 September 2026</td>
+</tr>
+<tr>
+<td>Authors</td>
+<td>Natalija Simin (Guest / Customer), Laslo Uri (Bungalow / Boat owner), David Jandrić (Instructor / Admin)</td>
+</tr>
+<tr>
+<td>Institution</td>
+<td>Faculty of Technical Sciences, University of Novi Sad, Computing and Control Engineering</td>
+</tr>
+<tr>
+<td>Live check</td>
+<td><code>scripts/full-smoke.ps1</code> <strong>66/66 PASS</strong>; Maven service tests green (JDK 17)</td>
+</tr>
+<tr>
+<td>Local entry</td>
+<td><code>http://localhost:8080</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s2">1. Purpose of the subject</h2>
+<p><strong>Internet Software Architectures (ISA)</strong> is the FTN course where a three-student team designs and ships a multi-role web system with a real persistence layer, authentication, and graded non-functional topics (concurrency, DevOps, scalability). The exam expects:</p>
+<ul>
+<li>a shared product with <strong>role-split ownership</strong> (each student defends a persona),</li>
+<li>REST + SPA (or equivalent) over a relational database,</li>
+<li>documented concurrent-access behaviour,</li>
+<li>automated tests and CI,</li>
+<li>a short scalability argument with at least one concrete mechanism in code.</li>
+</ul>
+<p>This dossier is the archive write-up for that defense: what the system is for, how it is built, what each grade band covers, and what the live UI looked like when verified in September 2026.</p>
+<h2 id="s3">2. Purpose of the project</h2>
+<p><strong>FishyFinds</strong> is a fishing-tourism marketplace. Guests browse coastal bungalows, boats, and instructor-led courses. Registered customers reserve and cancel slots. Advertisers (bungalow owners, boat owners, instructors) publish offers, manage availability, run discount “quick actions,” book for walk-in clients, and read occupancy / income charts. Administrators moderate registrations, reviews, complaints, account deletions, no-show penalties, the loyalty ladder, the user/offer directory, and the platform income cut.</p>
+<p>The product is intentionally one Spring Boot process serving a Vue 2 SPA from <code>static/</code>, backed by PostgreSQL. It is a course system, not a hosted production SaaS: SMTP may be unset, passwords are demo-level, and schema is recreated from seed on boot (<code>create-drop</code> + <code>data-postgres.sql</code>).</p>
+<h2 id="s4">3. Identification</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display name</td>
+<td><strong>FISHYFINDS</strong> (red fish mark, black wordmark)</td>
+</tr>
+<tr>
+<td>English product name</td>
+<td>FishyFinds — coastal stays &amp; fishing days</td>
+</tr>
+<tr>
+<td>Serbian product name</td>
+<td>FishyFinds — obalski smeštaj i ribolovni dani</td>
+</tr>
+<tr>
+<td>Kind</td>
+<td>Multi-role web application (SPA + REST)</td>
+</tr>
+<tr>
+<td>Backend</td>
+<td>Java 11 target, Spring Boot <strong>2.5.7</strong>, runs on JDK 17+</td>
+</tr>
+<tr>
+<td>Frontend</td>
+<td>Vue 2 (CDN), Vue Router history mode, Axios, SweetAlert2</td>
+</tr>
+<tr>
+<td>Maps / charts</td>
+<td>OpenLayers 6, Chart.js</td>
+</tr>
+<tr>
+<td>Persistence</td>
+<td>Spring Data JPA, Hibernate, PostgreSQL database <code>fishyfinds_db</code></td>
+</tr>
+<tr>
+<td>Auth</td>
+<td>Spring Security + JWT (<code>TokenUtils</code>), roles via <code>@PreAuthorize</code></td>
+</tr>
+<tr>
+<td>Mail</td>
+<td>Spring Mail (verification, booking, admin decisions; failures non-fatal)</td>
+</tr>
+<tr>
+<td>Build</td>
+<td>Maven Wrapper; GitHub Actions; SonarCloud</td>
+</tr>
+<tr>
+<td>Tests</td>
+<td>JUnit 5 + Mockito; PowerShell live smoke (<code>scripts/full-smoke.ps1</code>)</td>
+</tr>
+<tr>
+<td>UI language</td>
+<td>English chrome (course SPA)</td>
+</tr>
+<tr>
+<td>Doc languages</td>
+<td>English (this file) · Serbian Latin (<a href="DOSSIER_SR.md">DOSSIER_SR.md</a>)</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>Author</th>
+<th>Course roles</th>
+<th>Main surfaces</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Natalija Simin</td>
+<td>Guest, Customer</td>
+<td>Catalogs, register/activate, search &amp; book, cancel (≥3 days), history, feedback, follow, complaints, penalties, profile</td>
+</tr>
+<tr>
+<td>Laslo Uri</td>
+<td>Bungalow owner, Boat owner</td>
+<td>Offer CRUD, terms, quick actions, book-for-client, maps, unavailability calendar, <code>/owner-reports</code></td>
+</tr>
+<tr>
+<td>David Jandrić</td>
+<td>Instructor, Admin</td>
+<td>Courses, visit reports, loyalty, admin queues (registrations, reviews, complaints, deletions, penalties, directory, income)</td>
+</tr>
+</tbody>
+</table>
+<p>Seed password for all demo accounts: <strong><code>password</code></strong>.</p>
+<table>
+<thead>
+<tr>
+<th>Email</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mail@mail.com</code></td>
+<td>Customer</td>
+</tr>
+<tr>
+<td><code>zokaMagic@mail.com</code></td>
+<td>Bungalow owner</td>
+</tr>
+<tr>
+<td><code>zokiSumi@mail.com</code></td>
+<td>Boat owner</td>
+</tr>
+<tr>
+<td><code>vesnaVuki@mail.com</code></td>
+<td>Instructor</td>
+</tr>
+<tr>
+<td><code>admin@admin.com</code></td>
+<td>Admin</td>
+</tr>
+<tr>
+<td><code>pending.owner@mail.com</code></td>
+<td>Pending registration</td>
+</tr>
+</tbody>
+</table>
+<h2 id="s5">4. Scope</h2>
+<p>In scope: browsing three offer types; JWT login; customer booking/cancel; owner/instructor offer lifecycle (create, edit blocked while reserved, soft-delete, terms, quick actions, book-for-client); OpenLayers maps; occupancy / unavailability calendar; Chart.js reports; loyalty configuration; full admin moderation hub; concurrent-access write-ups; service tests; catalog caching for the scalability PoC.</p>
+<p>Out of scope / honest limits: production SMTP hardening, multi-tenant hosting, pixel-perfect capture of every nested admin modal, and a full human click-through of every SweetAlert path. Live smoke covers <strong>66</strong> API/UI-critical checks across roles; that is the verification bar used for this dossier.</p>
+<h2 id="s6">5. Technology stack (explained)</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Choice</th>
+<th>Why it is here</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spring Boot 2.5.7</td>
+<td>Application container</td>
+<td>Course-era stack: embedded Tomcat, auto-config for Web, Security, JPA, Mail</td>
+</tr>
+<tr>
+<td>Spring Web / Data REST</td>
+<td>HTTP surface</td>
+<td>Controllers under <code>controllers/</code> expose <code>/api/**</code>; SPA is static</td>
+</tr>
+<tr>
+<td>Spring Security + JWT</td>
+<td>AuthN/Z</td>
+<td>Stateless API: login returns token; filter parses <code>Authorization</code>; method security by role</td>
+</tr>
+<tr>
+<td>Spring Data JPA / Hibernate</td>
+<td>ORM</td>
+<td>Maps <code>User</code> hierarchy and <code>Offer</code> subtypes to PostgreSQL; <code>@Version</code> for optimistic locking</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>RDBMS</td>
+<td>Relational integrity for reservations overlapping terms; seed via <code>data-postgres.sql</code></td>
+</tr>
+<tr>
+<td>Spring Mail</td>
+<td>Notifications</td>
+<td>Activation, booking, subscriber quick-action mail; wrapped so missing SMTP does not fail bookings</td>
+</tr>
+<tr>
+<td>Vue 2 CDN SPA</td>
+<td>UI</td>
+<td>Fast course delivery without a Node build pipeline; components in <code>static/</code></td>
+</tr>
+<tr>
+<td>Vue Router (history)</td>
+<td>Client routes</td>
+<td>Pretty URLs; <code>SpaForwardController</code> forwards unknown GETs to <code>index.html</code></td>
+</tr>
+<tr>
+<td>Axios</td>
+<td>HTTP client</td>
+<td>Attaches JWT; talks to <code>/api</code></td>
+</tr>
+<tr>
+<td>OpenLayers 6</td>
+<td>Maps (grade 7)</td>
+<td>Offer detail maps from <code>Location</code> coordinates</td>
+</tr>
+<tr>
+<td>Chart.js</td>
+<td>Analytics (grade 7)</td>
+<td>Owner occupancy / income charts; admin finance views</td>
+</tr>
+<tr>
+<td>Spring Cache <code>@Cacheable</code></td>
+<td>Scalability PoC (grade 10)</td>
+<td>Catalog <code>findAll</code> for bungalows / boats / courses</td>
+</tr>
+<tr>
+<td>Maven + GHA + Sonar</td>
+<td>DevOps (grade 9)</td>
+<td>Build, test, static analysis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Source layout</strong></p>
+<pre><code class="language-text">src/main/java/com/fishyfinds/isa/
+  controllers/     REST (offers, users, terms, admin, analytics…)
+  service/         Business rules (reservation, mail, loyalty…)
+  model/           JPA entities + enums
+  repository/      Spring Data interfaces
+  security/        JWT filter, TokenUtils
+  config/          Security, cache, SPA forward
+src/main/resources/static/          Vue SPA (kebab-case pages)
+src/main/resources/data-postgres.sql
+docs/concurrent-access/             Grade 8 PDFs + MD
+docs/scalability/SCALABILITY_POC.md Grade 10 write-up
+scripts/full-smoke.ps1              Live verification
+</code></pre>
+<h2 id="s7">6. System architecture</h2>
+<figure class="diagram"><img alt="Architecture" src="assets/diagrams/architecture.svg" /><figcaption>Figure 1. Browser Vue SPA → Spring Boot (:8080) → controllers/services → JPA → PostgreSQL. JWT travels in <code>localStorage</code> and the <code>Authorization</code> header. Catalog reads may hit Spring Cache.</figcaption></figure>
+<figure class="diagram"><img alt="Use cases" src="assets/diagrams/use-case.svg" /><figcaption>Figure 2. Role split matching the three ISA students, plus shared grade 7–10 concerns.</figcaption></figure>
+<figure class="diagram"><img alt="Reservation flow" src="assets/diagrams/reservation-flow.svg" /><figcaption>Figure 3. Customer (or owner-for-client) booking path: controller → service checks → optimistic/pessimistic locks → commit → best-effort mail.</figcaption></figure>
+<p>Runtime is a <strong>single JVM</strong>. There is no separate Node server. Static assets and REST share origin <code>localhost:8080</code>, which simplifies CORS for the course demo.</p>
+<h2 id="s8">7. Domain model (application detail)</h2>
+<p><strong>Users.</strong> <code>User</code> implements <code>UserDetails</code>. Subtypes: <code>Customer</code>, <code>BungalowOwner</code>, <code>BoatOwner</code>, <code>Instructor</code>, <code>Admin</code>, plus <code>Authority</code> / registration status. Owners and instructors register as advertisers and wait for admin approval; customers activate via mail token when SMTP is configured.</p>
+<p><strong>Offers.</strong> Abstract <code>Offer</code> with <code>Location</code>, <code>ImageItem</code>, <code>AdditionalService</code>, <code>Price</code>. Concrete types: <code>Bungalow</code>, <code>Boat</code> (with <code>Engine</code>), <code>Course</code> (instructor link). Soft-delete and “no edit while active reservations” protect booked inventory.</p>
+<p><strong>Scheduling.</strong> <code>Term</code> is a bookable window on an offer (<code>@Version</code>). <code>Reservation</code> binds a customer (or null for <code>ReservationType.QUICK</code>) to a term. <code>CancelledReservation</code> records cancels. <code>OfferUnavailability</code> blocks calendar ranges so bookings cannot overlap closed periods (grade 7).</p>
+<p><strong>Moderation &amp; loyalty.</strong> <code>Complaint</code>, <code>UserFeedback</code>, <code>AccountDeletionRequest</code>, <code>Penal</code>, <code>LoyaltyProgram</code>, per-role loyalty rows (<code>CustomerLoyalty</code>, <code>OwnerLoyalty</code>, <code>InstructorLoyalty</code>), <code>VisitReport</code>, <code>Subscriber</code> (follow offer → mail on quick action).</p>
+<p><strong>Key rules coded in services</strong></p>
+<ul>
+<li>Cancel only if the reservation starts in <strong>≥ 3 days</strong>.</li>
+<li><code>createQuickAction</code> creates a quick reservation and emails subscribers (<code>MailService.sendNewActionEmail</code>).</li>
+<li><code>updateBungalow|Boat|Course/{id}</code> refused when active reservations exist.</li>
+<li>Terms returned by <code>getTermsByOfferId</code> only if <code>endTime</code> is still after “now” (seed windows pushed to <strong>2027</strong> so the 2026 archive run stays bookable).</li>
+<li>Missing customer <code>Penal</code> row is auto-created on booking so penalty flows never NPE.</li>
+<li>Duplicate <code>DELETE /api/deleteUser/{id}</code> mapping was removed; directory delete stays on <code>AdminDirectoryController</code>.</li>
+</ul>
+<h2 id="s9">8. Functional specification by role</h2>
+<p><strong>Guest.</strong> Landing hero; browse bungalows / boats / courses; open details (description, price, rating, map); register; sign in.</p>
+<p><strong>Customer.</strong> Search/sort catalogs; reserve a free term; see upcoming / history; cancel with the 3-day rule; leave feedback; follow offers for actions; file complaints; view penalties; edit profile.</p>
+<p><strong>Bungalow / boat owner.</strong> My listings with Details / Terms / Edit / Actions / Book for client / Delete; add terms via daterange UI; publish quick actions; mark unavailability on calendar; open <code>/owner-reports</code> charts; visit report entry points where applicable.</p>
+<p><strong>Instructor.</strong> Same offer-management parity on courses (<code>/my-courses</code>): terms, actions, book-for-client, calendar, reports.</p>
+<p><strong>Admin.</strong> Dashboard tiles: registrations, complaints, reviews, deletion requests, penalties, directory, register admin, loyalty, income / system cut. Each tile opens a moderation queue with accept/deny style decisions and optional mail.</p>
+<h2 id="s10">9. Grade ladder (ISA 6 → 10)</h2>
+<table>
+<thead>
+<tr>
+<th>Grade</th>
+<th>Expectation</th>
+<th>What is in this tree</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>6</strong></td>
+<td>Core §3 marketplace</td>
+<td>Terms UI for all offer types; <code>POST /api/createQuickAction</code> + subscriber mail; <code>PUT</code> update endpoints; book-for-client; soft-delete</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>Maps, charts, calendar, loyalty</td>
+<td>OpenLayers on details; Chart.js reports; <code>OfferUnavailability</code>; <code>/admin-loyalty</code></td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td>Concurrent access</td>
+<td>PDFs under <code>docs/concurrent-access/</code> (Students 1–3); <code>@Version</code> + locks in services</td>
+</tr>
+<tr>
+<td><strong>9</strong></td>
+<td>DevOps + tests</td>
+<td>GitHub Actions, SonarCloud; Mockito tests for reservation create/cancel, quick action, loyalty CRUD, penal approve</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>Scalability</td>
+<td><code>docs/scalability/SCALABILITY_POC.md</code>; <code>@Cacheable</code> on catalog <code>findAll</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="s11">10. User interface (live captures)</h2>
+<p>Screens captured from the local app on 9 September 2026 against seeded data. Images live in <a href="screenshots/"><code>../screenshots/</code></a>.</p>
+<h3>10.1 Guest and customer</h3>
+<figure class="shot"><img alt="Guest home" src="screenshots/01-guest-home.png" /><figcaption>Figure 4. Guest home — harbor hero, brand </em><em>FISHYFINDS</em><em>, CTAs for bungalows / boats / courses, REGISTER and SIGN IN in the chrome.</figcaption></figure>
+<figure class="shot"><img alt="Bungalow catalog" src="screenshots/02-bungalows.png" /><figcaption>Figure 5. Public bungalow catalog — card grid with photo, price, rating, location; entry point for guest browsing and customer search.</figcaption></figure>
+<figure class="shot"><img alt="Sign in" src="screenshots/03-sign-in.png" /><figcaption>Figure 6. Sign-in — JWT login against <code>/api</code> authentication; demo accounts use password <code>password</code>.</figcaption></figure>
+<figure class="shot"><img alt="Boats catalog" src="screenshots/13-boats-catalog.png" /><figcaption>Figure 7. Boats catalog — same product-card pattern as bungalows; owner role later manages these via My boats.</figcaption></figure>
+<figure class="shot"><img alt="Courses catalog" src="screenshots/14-courses-catalog.png" /><figcaption>Figure 8. Courses catalog — instructor-led fishing courses exposed to guests and customers.</figcaption></figure>
+<figure class="shot"><img alt="Make reservation" src="screenshots/04-make-reservation.png" /><figcaption>Figure 9. Reservation flow UI — customer selects a free term on an offer and confirms booking (service enforces availability and unavailability rules).</figcaption></figure>
+<figure class="shot"><img alt="Upcoming reservations" src="screenshots/05-upcoming.png" /><figcaption>Figure 10. Customer upcoming reservations — cancel is offered only when the ≥3-day rule still holds.</figcaption></figure>
+<h3>10.2 Owners and instructor</h3>
+<figure class="shot"><img alt="My bungalows" src="screenshots/06-owner-bungalows.png" /><figcaption>Figure 11. My bungalows (Laslo / bungalow owner) — search/sort, ADD BUNGALOW, and per-card Details / Terms / Edit / Actions / Book for client / Delete.</figcaption></figure>
+<figure class="shot"><img alt="My boats" src="screenshots/15-my-boats.png" /><figcaption>Figure 12. My boats — boat-owner parity with the bungalow management surface.</figcaption></figure>
+<figure class="shot"><img alt="My courses" src="screenshots/16-my-courses.png" /><figcaption>Figure 13. My courses (instructor) — course CRUD and the same term/action/book tools as other advertisers.</figcaption></figure>
+<figure class="shot"><img alt="Owner calendar" src="screenshots/07-owner-calendar.png" /><figcaption>Figure 14. Owner calendar — occupancy plus <code>OfferUnavailability</code> blocks so closed ranges cannot be booked.</figcaption></figure>
+<figure class="shot"><img alt="Owner reports" src="screenshots/08-owner-reports.png" /><figcaption>Figure 15. Owner reports — Chart.js business charts (occupancy / income style analytics for the advertiser).</figcaption></figure>
+<h3>10.3 Admin</h3>
+<figure class="shot"><img alt="Admin home" src="screenshots/09-admin-home.png" /><figcaption>Figure 16. Admin dashboard — tile hub for registrations, complaints, reviews, deletions, penalties, directory, register-admin, loyalty, income.</figcaption></figure>
+<figure class="shot"><img alt="Admin registrations" src="screenshots/10-admin-registrations.png" /><figcaption>Figure 17. Registrations queue — approve or deny pending advertiser registrations.</figcaption></figure>
+<figure class="shot"><img alt="Admin complaints" src="screenshots/11-admin-complaints.png" /><figcaption>Figure 18. Complaints queue — resolve customer complaints with admin decision mail when SMTP is available.</figcaption></figure>
+<figure class="shot"><img alt="Admin income" src="screenshots/12-admin-income.png" /><figcaption>Figure 19. Income / system cut — platform finance overview for the administrator.</figcaption></figure>
+<figure class="shot"><img alt="Admin loyalty" src="screenshots/17-admin-loyalty.png" /><figcaption>Figure 20. Loyalty program — configure categories and point rates (grade 7 epic owned with the instructor/admin student).</figcaption></figure>
+<h2 id="s12">11. Security, mail, and data</h2>
+<ul>
+<li>Passwords stored with Spring Security hashing; API authorization is JWT + role checks.</li>
+<li>Registration for advertisers stays <code>PENDING</code> until admin approval.</li>
+<li>Mail is <strong>best-effort</strong>: booking and quick-action success paths do not depend on a working SMTP server (important for offline demos).</li>
+<li>Schema strategy for demos: Hibernate <code>create-drop</code> reloads <code>data-postgres.sql</code> each boot. Term dates in seed use <strong>2027</strong> windows. Sequence <code>setval</code> calls keep <code>loyalty_program</code> / <code>penal</code> inserts from colliding with identity columns.</li>
+</ul>
+<h2 id="s13">12. Concurrency, tests, and scalability</h2>
+<p><strong>Concurrency (grade 8).</strong> Optimistic <code>@Version</code> on <code>Term</code> and <code>Reservation</code>; pessimistic locking on customer lookup where double-booking races matter. Narrative + diagrams: <code>docs/concurrent-access/</code> (Student 1 client, Student 2 owners, Student 3 admin/instructor).</p>
+<p><strong>Tests (grade 9).</strong> Service-level Mockito coverage for reservation create/cancel, quick action, loyalty CRUD, and penal approval. <code>./mvnw test</code> on JDK 17 is green. Live regression: <code>scripts/full-smoke.ps1</code> (66 checks).</p>
+<p><strong>Scalability (grade 10).</strong> Written PoC discusses partitioning, read replicas, load balancing, and caching. In code, catalog <code>findAll</code> endpoints are <code>@Cacheable</code> so repeated guest traffic does not always hit PostgreSQL.</p>
+<h2 id="s14">13. Build and run (2026 check)</h2>
+<pre><code class="language-text"># PostgreSQL: database fishyfinds_db (defaults user/password root/root;
+# override with DB_USERNAME / DB_PASSWORD — do not commit secrets)
+
+./mvnw spring-boot:run
+# open http://localhost:8080
+
+./mvnw test
+powershell -File scripts/full-smoke.ps1
+powershell -File scripts/capture-screenshots.ps1
+</code></pre>
+<p>JDK <strong>17+</strong> recommended even though <code>pom.xml</code> declares Java 11. App serves SPA and API on port <strong>8080</strong>.</p>
+<h2 id="s15">14. Summary</h2>
+<p>FishyFinds is the ISA 2021/22 team archive: a Spring Boot + Vue 2 + PostgreSQL marketplace for bungalows, boats, and fishing courses, with a clear three-student role split, JWT security, admin moderation, maps/charts/calendar/loyalty, concurrent-access documentation, automated tests/CI, and a caching-backed scalability note. Verified locally on 9 September 2026 with <strong>66/66</strong> smoke checks and green Maven tests. This dossier pairs English and Serbian Latin editions for the oral defense and for later rebuilds of the archive.</p>
+<h2 id="s16">15. Related documents</h2>
+<table>
+<thead>
+<tr>
+<th>Document</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Serbian dossier</td>
+<td><a href="DOSSIER_SR.md">DOSSIER_SR.md</a></td>
+</tr>
+<tr>
+<td>Interactive HTML</td>
+<td><a href="dossier.html">dossier.html</a></td>
+</tr>
+<tr>
+<td>Concurrent access</td>
+<td><code>../concurrent-access/</code></td>
+</tr>
+<tr>
+<td>Scalability PoC</td>
+<td><code>../scalability/SCALABILITY_POC.md</code></td>
+</tr>
+<tr>
+<td>Screenshots</td>
+<td><code>../screenshots/</code></td>
+</tr>
+<tr>
+<td>Diagrams</td>
+<td><code>../assets/diagrams/</code></td>
+</tr>
+</tbody>
+</table>
+<p><em>FishyFinds ISA technical dossier — English edition.</em></p>
+</div>
+</td></tr></tbody>
+</table>
+</body>
+</html>

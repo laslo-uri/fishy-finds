@@ -16,82 +16,49 @@ Vue.component('admin-register', {
 		    },
 		    confirmPassword : "",
 		    enabled: false,
-		    backgroundColor: "seagreen",
+		    backgroundColor: "#ed1c24",
             registrationTitle: "Administrator Registration",
 		    cursorStyle: "default",
             showForm: 0,
 		}
 	},
 template: `
-		<div>
+		<div class="ff-catalog">
             <nav-bar></nav-bar>
-
-            <div class="col-md-4 left-div" style="margin-top:-20px">
-                    <p class="title-text-bold" style="margin-top:30px;"> Registration </p>
-                    <div class="row">
-                        <p class="title-text-light">Create an account!</p>
-                        <p class="title-text-light" style="font-size:15px;">Register for FishyFinds:</p>
-                            </div>
-                            <div class="row options justify-content-evenly">
-                                <div class="options-4-horizontal justify-content-center" @click="registerAdmin">
-                                    <img class="image" src="images/register-admin.png">
-                                    <p class="title-text-bold" style="font-size:12px"> a new Administrator </p>
-                                </div>
-                    </div>
-            </div>
-
-            <div class="col-md-4 right-div" style="margin-top:-20px">
-                <div class="container align-items-start">
-                    <p class="title-text-bold" style="margin-top:10px;"> {{registrationTitle}} </p>
-                    <form class="justify-content-center">
-                        <table class="justify-content-center" style="width:75%; margin: auto; table-layout:fixed;" >
-                            <tr>
-                                <td><input type="text" placeholder="   First name" class="input-text" v-model="dto.firstName"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Last name" class="input-text"  v-model="dto.lastName"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Address" class="input-text"  v-model="dto.address"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   City" class="input-text"  v-model="dto.city"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Country" class="input-text"  v-model="dto.country"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Phone number" class="input-text"  v-model="dto.phoneNumber" /></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   E-mail" class="input-text"  v-model="dto.email" /></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="password" placeholder="   Password" class="input-text"  v-model="dto.password"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="password" placeholder="   Confirm password" class="input-text"  v-model="confirmPassword"/></td>
-                            </tr>
-                            <br>
-                            <tr v-show="showForm == 2 || showForm == 3">
-                                <textarea rows="5" name="text" placeholder="   Reasoning" class="input-text"  v-model="dto.reasoning" ></textarea>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}" :disabled="!isComplete" class="confirm" type="button" value="Register" @click="registerUser"/></td>
-                            </tr>
-                        </table>
-                    </form>
+            <section class="ff-catalog__shell">
+                <div class="ff-section-head">
+                    <h2>Registration</h2>
+                    <p>Create a new FishyFinds administrator account.</p>
                 </div>
-            </div>
+                <div class="ff-role-grid">
+                    <button type="button" class="ff-role-card" @click="registerAdmin">
+                        <img src="images/register-admin.png" alt="">
+                        <strong>New administrator</strong>
+                        <span>Register another system admin</span>
+                    </button>
+                </div>
+                <div class="ff-detail" style="margin-top:1.5rem;">
+                    <h3 class="ff-detail__title">{{ registrationTitle }}</h3>
+                    <div class="ff-form-grid">
+                        <input type="text" placeholder="First name" class="ff-field" v-model="dto.firstName"/>
+                        <input type="text" placeholder="Last name" class="ff-field" v-model="dto.lastName"/>
+                        <input type="text" placeholder="Address" class="ff-field" v-model="dto.address"/>
+                        <input type="text" placeholder="City" class="ff-field" v-model="dto.city"/>
+                        <input type="text" placeholder="Country" class="ff-field" v-model="dto.country"/>
+                        <input type="text" placeholder="Phone number" class="ff-field" v-model="dto.phoneNumber"/>
+                        <input type="email" placeholder="E-mail" class="ff-field" v-model="dto.email"/>
+                        <input type="password" placeholder="Password" class="ff-field" v-model="dto.password"/>
+                        <input type="password" placeholder="Confirm password" class="ff-field" v-model="confirmPassword"/>
+                        <textarea v-show="showForm == 2 || showForm == 3" rows="4" placeholder="Reasoning" class="ff-field ff-field--wide" v-model="dto.reasoning"></textarea>
+                    </div>
+                    <button
+                        type="button"
+                        class="ff-btn ff-btn--primary"
+                        :disabled="!isComplete"
+                        :style="{'background-color':backgroundColor, 'cursor':cursorStyle, 'margin-top':'1rem'}"
+                        @click="registerUser">Register</button>
+                </div>
+            </section>
 		</div>
 		`
 	,
@@ -108,7 +75,7 @@ template: `
         		    /\S/.test(this.dto.password) &&
         		    /\S/.test(this.confirmPassword);
 
-        		    this.backgroundColor = flag ? "seagreen" : "#2e4f3c";
+        		    this.backgroundColor = flag ? "#ed1c24" : "#c9a0a2";
         		    this.cursorStyle = flag ? "pointer" : "default";
         		    return flag;
         		  }
@@ -122,8 +89,8 @@ template: `
                     text: "By confirming this, you will create a new admin user.",
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    confirmButtonColor: '#ed1c24',
+                    cancelButtonColor: '#1a1a1a',
                     confirmButtonText: 'Confirm'
 
                 })

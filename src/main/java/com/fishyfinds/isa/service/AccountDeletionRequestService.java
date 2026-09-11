@@ -4,8 +4,8 @@ import com.fishyfinds.isa.model.beans.AccountDeletionRequest;
 import com.fishyfinds.isa.model.beans.ResolveDeletionRequest;
 import com.fishyfinds.isa.model.enums.DeletionRequestStatus;
 import com.fishyfinds.isa.repository.AccountDeletionRequestRepository;
-import com.fishyfinds.isa.repository.usersRepository.UserRepository;
-import com.fishyfinds.isa.service.usersService.UserService;
+import com.fishyfinds.isa.repository.users.UserRepository;
+import com.fishyfinds.isa.service.users.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -109,17 +109,31 @@ public class AccountDeletionRequestService {
         return allPendingRequests;
     }
 
-    public boolean approveCreationRequest(AccountDeletionRequest request) {
-        AccountDeletionRequest req = accountDeletionRequestRepository.findById(request.getRequestId()).orElse(null);
-        if(request == null){
+    public boolean approveCreationRequest(Long requestId) {
+        AccountDeletionRequest req = accountDeletionRequestRepository.findById(requestId).orElse(null);
+        if (req == null || req.getUser() == null) {
             return false;
-        }else{
-            userService.activateUser(request.getUser().getId());
-            mailService.sendCreationApprovalMail(userService.findUser(request.getUser().getId()).getEmail());
-            request.setStatus(DeletionRequestStatus.ACCEPTED_CREATION);
-            accountDeletionRequestRepository.save(request);
-            return true;
         }
+        userService.activateUser(req.getUser().getId());
+        mailService.sendCreationApprovalMail(userService.findUser(req.getUser().getId()).getEmail());
+        req.setStatus(DeletionRequestStatus.ACCEPTED_CREATION);
+        accountDeletionRequestRepository.save(req);
+        return true;
+    }
+
+    /** @deprecated prefer {@link #approveCreationRequest(Long)} */
+    public boolean approveCreationRequest(AccountDeletionRequest request) {
+        if (request == null) {
+            return false;
+        }
+        Long id = request.getRequestId() != null ? request.getRequestId() : (request.getId() != null ? request.getId() : null);
+        if (id == null && request.getUser() != null) {
+            AccountDeletionRequest fromUser = accountDeletionRequestRepository.findByUser(request.getUser());
+            if (fromUser != null) {
+                id = fromUser.getId();
+            }
+        }
+        return id != null && approveCreationRequest(id);
     }
 
     public boolean denyCreationRequest(ResolveDeletionRequest creationRequest) throws MessagingException, UnsupportedEncodingException {

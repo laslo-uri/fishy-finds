@@ -1,7 +1,7 @@
 package com.fishyfinds.isa.service;
 
 import com.fishyfinds.isa.model.beans.users.User;
-import com.fishyfinds.isa.repository.usersRepository.UserRepository;
+import com.fishyfinds.isa.repository.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Concurrent Access — Student 2 (Owners)</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 2rem auto; line-height: 1.5; color: #222; }
+    h1, h2, h3 { font-family: Arial, sans-serif; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3rem; }
+    h2 { margin-top: 2rem; }
+    code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; }
+    @media print { body { margin: 1cm; } }
+  </style>
+</head>
+<body>
+  <h1>Concurrent Database Access — Student 2 (Owners / Laslo)</h1>
+  <p>Section 4.4 write-up for bungalow and boat owner conflict scenarios in FishyFinds.</p>
+  <p>Relevant code: <code>BungalowController</code>, <code>BoatController</code>, <code>TermController</code>, <code>TermService</code>,
+    <code>ReservationService</code>, <code>Term</code> / <code>Reservation</code> (<code>@Version</code>), image save during <code>addNewBungalow</code> / <code>addNewBoat</code>.</p>
+
+  <h2>1. Owner creates reservation while client books the same slot</h2>
+  <h3>Situation</h3>
+  <p>An owner defines or books a period on an offer at the same time a customer calls <code>makeReservation</code> for an overlapping interval on the same term.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li>Customer: <code>ReservationController.makeReservation</code> → <code>ReservationService.makeReservation</code></li>
+    <li>Owner: <code>TermController.addNewTermToOffer</code> → <code>TermService.addNewTermToOffer</code></li>
+    <li>Entities: <code>Term</code> (<code>@Version</code>), <code>Reservation</code> (<code>@Version</code>)</li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> via <code>@Version</code> on <code>Term</code> and <code>Reservation</code>. The second commit that updates the same term version fails.</p>
+  <h3>Why chosen</h3>
+  <p>Owner and client paths converge on the same term entity. Optimistic locking fits interactive UI flows where conflicts are uncommon.</p>
+
+  <h2>2. Owner defines an action while client reserves</h2>
+  <h3>Situation</h3>
+  <p>The owner creates a quick action (<code>ReservationType.QUICK</code>) while a customer books an overlapping default reservation or claims another action.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li>Owner: <code>POST /api/createQuickAction</code> → <code>ReservationController.createQuickAction</code> → <code>ReservationService.createQuickAction</code> (<code>ReservationType.QUICK</code>; overlap check via <code>hasOverlappingActiveReservation</code>)</li>
+    <li>Also: <code>ReservationService.getActionsForOffer</code></li>
+    <li>Customer: <code>makeReservation</code> / <code>makeReservationAction</code></li>
+    <li>Entity: <code>Reservation</code> with <code>@Version</code></li>
+  </ul>
+  <h3>Note on <code>createQuickAction</code></h3>
+  <p><code>createQuickAction</code> is the concrete owner write path that races with client <code>makeReservation</code>:
+    both can pass an overlap check on a stale snapshot and insert conflicting active rows.
+    Optimistic <code>@Version</code> on <code>Reservation</code>/<code>Term</code> (and/or tightening the overlap check inside the same transaction)
+    makes the losing writer fail instead of silently double-booking.</p>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> on <code>Reservation</code> (and <code>Term</code> when linked into the term’s reservation list).</p>
+  <h3>Why chosen</h3>
+  <p>Actions are stored as reservation rows; versioning those rows matches the customer-side action race solution.</p>
+
+  <h2>3. Delete offer while it is reserved</h2>
+  <h3>Situation</h3>
+  <p>An owner deletes a bungalow/boat offer that still has active upcoming reservations, racing with new bookings.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>BungalowController</code> / <code>BoatController</code> / <code>OfferService</code></li>
+    <li><code>ReservationService</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p>Business guard (reject delete if active reservations exist) plus <strong>optimistic locking</strong> on related <code>Reservation</code>/<code>Term</code> rows.</p>
+  <h3>Why chosen</h3>
+  <p>Deleting an offer is rare and high-impact; explicit reservation checks are clearer than locks alone.</p>
+
+  <h2>Extra: concurrent addNewBungalow image save / two owners editing same offer</h2>
+  <h3>Situation</h3>
+  <p>Parallel <code>POST /api/addNewBungalow</code> image saves can overwrite files named from offer count.
+    Two sessions editing the same offer can last-write-wins on metadata.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>BungalowController.addNewBungalow</code> → <code>BungalowService.addNewBungalow</code></li>
+    <li><code>BoatController</code> / <code>BoatService.addNewBoat</code>, <code>ImageItem</code>, <code>ImageService</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p>Add <code>@Version</code> on <code>Offer</code> for metadata races; use unique image filenames (UUID) or serialize <code>saveImage</code> per offer.</p>
+  <h3>Why chosen</h3>
+  <p>File-system writes are not covered by JPA <code>@Version</code> alone.</p>
+
+  <h2>Summary</h2>
+  <table>
+    <tr><th>Concern</th><th>Mechanism</th></tr>
+    <tr><td>Term availability</td><td><code>@Version</code> on <code>Term</code></td></tr>
+    <tr><td>Reservation / action</td><td><code>@Version</code> on <code>Reservation</code></td></tr>
+    <tr><td>Penalty vs book</td><td>Pessimistic lock on <code>CustomerRepository.findByEmail</code></td></tr>
+    <tr><td>Images</td><td>Unique paths / short critical section</td></tr>
+  </table>
+</body>
+</html>

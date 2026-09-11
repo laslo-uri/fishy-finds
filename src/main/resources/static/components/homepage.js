@@ -1,7 +1,7 @@
 Vue.component('homepage', {
 
 	data: function(){
-		return{	
+		return{
 			loggedUser: {
 				userType:''
 			},
@@ -10,149 +10,153 @@ Vue.component('homepage', {
                oldPassword: '',
                newPassword: ''
             },
+			confirmPassword: '',
 			map:{}
 		}
 	},
 template: `
 
-		<div class="homepage">
+		<div class="homepage ff-home">
 			<nav-bar></nav-bar>
 
-			<div id="map" class="map" style="width: 100%; height: 300px;"> </div>
-
-			<div class="welcome-text container-fluid justify-content-center">
-				<h1 v-if="loggedUser.userType == '' || loggedUser.userType == 'CUSTOMER'">Plan your next trip with confidence!</h1>
-				<h1 v-if="loggedUser.userType == 'BUNGALOW_OWNER'">Plan your next trip with confidence!</h1>
-				<h1 v-if="loggedUser.userType == 'BOAT_OWNER'">Plan your next trip with confidence!</h1>
-				<h1 v-if="loggedUser.userType == 'INSTRUCTOR'">Plan your next trip with confidence!</h1>
-				<h1 v-if="loggedUser.userType == 'ADMIN'">Welcome back dear administrator!</h1>
-			</div>
-
-			<div class="wrapper" v-if="loggedUser.userType == '' || loggedUser.userType == 'CUSTOMER'">
-
-				<div class="card">
-					<img src="images/homepage-bungalows.jpg">
-					<div class="info">
-						<h1>Bungalows</h1>
-						<p>Perfect places to rest after a day full of fishing!</p>
-						<a class="btn btn-light" href="#/bungalows" role="button">Read More</a>
+			<section class="ff-hero" v-if="loggedUser.userType == '' || loggedUser.userType == 'CUSTOMER'">
+				<div class="ff-hero__media" aria-hidden="true"></div>
+				<div class="ff-hero__shade" aria-hidden="true"></div>
+				<div class="ff-hero__content">
+					<div class="ff-hero__eyebrow">Coastal stays &amp; fishing days</div>
+					<p class="ff-hero__brand">FishyFinds</p>
+					<p class="ff-hero__lead">Book bungalows, boats, and instructor-led courses with the clarity of a product catalog and the calm of a harbor morning.</p>
+					<div class="ff-hero__actions">
+						<a class="ff-btn ff-btn--primary" href="/bungalows">Browse bungalows</a>
+						<a class="ff-btn ff-btn--ghost" href="/boats">Explore boats</a>
+						<a class="ff-btn ff-btn--ghost" href="/courses">Find courses</a>
 					</div>
 				</div>
+			</section>
 
-				<div class="card">
-					<img src="images/homepage-boats.jpg">
-					<div class="info">
-						<h1>Boats</h1>
-						<p>The easiest way to get around here</p>
-						<a class="btn btn-light" href="#/boats" role="button">Read More</a>
-					</div>
-				</div>		
+			<section class="ff-discover" v-if="loggedUser.userType == '' || loggedUser.userType == 'CUSTOMER'">
+				<div class="ff-section-head">
+					<h2>Products</h2>
+					<p>Three ways to plan your next trip - stays, vessels, and guided fishing.</p>
+				</div>
+				<div class="ff-discover__grid">
+					<a class="ff-tile" href="/bungalows">
+						<div class="ff-tile__media">
+							<img src="images/homepage-bungalows.png" alt="Coastal bungalow overlooking turquoise water">
+						</div>
+						<div class="ff-tile__body">
+							<h3>Bungalows</h3>
+							<p>Rest by the water after a full day of fishing.</p>
+							<span class="ff-tile__link">View stays</span>
+						</div>
+					</a>
+					<a class="ff-tile" href="/boats">
+						<div class="ff-tile__media">
+							<img src="images/homepage-boats.png" alt="Fishing boat on calm dawn water">
+						</div>
+						<div class="ff-tile__body">
+							<h3>Boats</h3>
+							<p>Charters and day boats for the next stretch of coastline.</p>
+							<span class="ff-tile__link">View boats</span>
+						</div>
+					</a>
+					<a class="ff-tile" href="/courses">
+						<div class="ff-tile__media">
+							<img src="images/homepage-courses.png" alt="Shore casting lesson at sunrise">
+						</div>
+						<div class="ff-tile__body">
+							<h3>Courses</h3>
+							<p>Learn with instructors who know the local waters.</p>
+							<span class="ff-tile__link">View courses</span>
+						</div>
+					</a>
+				</div>
+			</section>
 
-				<div class="card">
-					<img src="images/homepage-courses.jpg">
-					<div class="info">
-						<h1>Courses</h1>
-						<p>Get prepared for the best adventures!</p>
-						<a class="btn btn-light" href="#/instructors" role="button">Read More</a>
+			<div class="ff-owner-panel" v-if="loggedUser.userType == 'BUNGALOW_OWNER'">
+				<h1 class="ff-panel-title">My bungalows</h1>
+				<div class="wrapper">
+					<div class="card">
+						<img src="images/homepage-bungalows.png" alt="">
+						<div class="info">
+							<h1>Portfolio</h1>
+							<p>Manage availability, photos, and guest stays.</p>
+							<a class="ff-btn ff-btn--primary" href="/my-bungalows">Open portfolio</a>
+						</div>
 					</div>
 				</div>
-		
-
 			</div>
 
-			<div class="wrapper" v-if="loggedUser.userType == 'BUNGALOW_OWNER'">
-
-				<div class="card">
-					<img src="images/homepage-bungalows.jpg">
-					<div class="info">
-						<h1>My Bungalows</h1>
-						<p>Manage your bungalows!</p>
-						<a class="btn btn-light" href="#/my-bungalows" role="button">My bungalows</a>
+			<div class="ff-owner-panel" v-if="loggedUser.userType == 'BOAT_OWNER'">
+				<h1 class="ff-panel-title">My fleet</h1>
+				<div class="wrapper">
+					<div class="card">
+						<img src="images/homepage-boats.png" alt="">
+						<div class="info">
+							<h1>Boats</h1>
+							<p>Keep charters, calendars, and reports in one place.</p>
+							<a class="ff-btn ff-btn--primary" href="/my-boats">Open fleet</a>
+						</div>
 					</div>
 				</div>
-			
 			</div>
 
-			<div class="wrapper" v-if="loggedUser.userType == 'BOAT_OWNER'">
-
-				<div class="card">
-					<img src="images/homepage-boats.jpg">
-					<div class="info">
-						<h1>My Boats</h1>
-						<p>Manage your boats!</p>
-						<a class="btn btn-light" href="#/my-boats" role="button">My boats</a>
+			<div class="ff-owner-panel" v-if="loggedUser.userType == 'INSTRUCTOR'">
+				<h1 class="ff-panel-title">My courses</h1>
+				<div class="wrapper">
+					<div class="card">
+						<img src="images/homepage-courses.png" alt="">
+						<div class="info">
+							<h1>Courses</h1>
+							<p>Publish adventures and guide your next group.</p>
+							<a class="ff-btn ff-btn--primary" href="/my-courses">Open courses</a>
+						</div>
 					</div>
 				</div>
-
 			</div>
 
-			<div class="wrapper" v-if="loggedUser.userType == 'INSTRUCTOR'">
-
-				<div class="card">
-					<img src="images/homepage-courses.jpg">
-					<div class="info">
-						<h1>My Courses</h1>
-						<p>Manage your courses!</p>
-						<a class="btn btn-light" href="#/my-courses" role="button">My courses</a>
-					</div>
+			<div class="ff-admin-panel" v-if="loggedUser.userType == 'ADMIN'">
+				<div class="ff-section-head" v-if="loggedUser.numberOfLogIns > 0" style="padding: 2rem 1rem 0;">
+					<h2>Admin console</h2>
+					<p>Moderation queues, loyalty, and platform income.</p>
 				</div>
 
-			</div>
+				<div class="ff-role-grid" v-if="loggedUser.numberOfLogIns > 0" style="padding: 1rem;">
+					<a class="ff-role-card" href="/admin">
+						<img src="images/admin-registrations.png" alt="">
+						<strong>Admin home</strong>
+						<span>Open all moderation and finance tools</span>
+					</a>
+					<a class="ff-role-card" href="/admin/registrations">
+						<img src="images/admin-user-requests.jpg" alt="">
+						<strong>Registrations</strong>
+						<span>Approve or reject advertiser sign-ups</span>
+					</a>
+					<a class="ff-role-card" href="/admin-loyalty">
+						<img src="images/admin-settings.png" alt="">
+						<strong>Loyalty &amp; income</strong>
+						<span>Categories and platform cut</span>
+					</a>
+					<a class="ff-role-card" href="/account">
+						<img src="images/admin-profile.png" alt="">
+						<strong>Profile</strong>
+						<span>Update account details and password</span>
+					</a>
+				</div>
 
-			<div class="wrapper" v-if="loggedUser.userType == 'ADMIN'">
-
-
-
-			    <div class="card" v-if="loggedUser.numberOfLogIns > 0">
-			        <img src="images/admin-registrations.jpg">
-			        <div class="info">
-			            <h1>Registrations, Requests and Complaints</h1>
-			            <p>Manage new registrations, user requests and complaints!</p>
-			            <a class="btn btn-light" href="#/admin-reg-req-complaints" role="button">Show more</a>
-			        </div>
-			    </div>
-
-			    <div class="card" v-if="loggedUser.numberOfLogIns > 0">
-			        <img src="images/admin-settings.jpg">
-			        <div class="info">
-			            <h1>Fishy Finds' System</h1>
-			            <p>Track all users, their actions and manage your budget and statistics.</p>
-			            <a class="btn btn-light" href="#/admin-fishy-finds-system" role="button">Show more</a>
-			        </div>
-			    </div>
-
-			    <div class="card" v-if="loggedUser.numberOfLogIns > 0">
-			        <img src="images/admin-profile.jpg">
-			        <div class="info">
-			            <h1>Your Profile</h1>
-			            <p>Access and manage your own profile on Fishy Finds!</p>
-			            <a class="btn btn-light" href="#/account" role="button">Show more</a>
-			        </div>
-			    </div>
-
-                <div class="container align-items-start" v-if="loggedUser.numberOfLogIns == 0">
-                    <p class="title-text-bold">Please change your password.</p>
-                    <p class="title-text-light" style="font-size:15px;">Since this is your first login on Fishy Finds, we require that you change your password.</p>
-                    <form class="justify-content-center">
-                        <table class="justify-content-center" style="width:75%; margin: auto;" >
-                            <tr>
-                            <td><input type="password" placeholder="   Old password" class="update-text-profile" v-model="passwordDTO.oldPassword"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                            <td><input type="password" placeholder="   New password" class="update-text-profile" v-model="passwordDTO.newPassword"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                            <td><input type="password" placeholder="   Confirm new password" class="update-text-profile" v-model="confirmPassword"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                            <td><input :disabled="!isCompletePassword" class="confirm-profile" type="button" value="Update your password" @click="savePassword"/></td>
-                            </tr>
-                            <br>
-                        </table>
-                    </form>
+                <div class="ff-catalog__shell" v-if="loggedUser.numberOfLogIns == 0">
+                    <div class="ff-detail" style="max-width:420px; margin: 2rem auto;">
+                        <h3 class="ff-detail__title">Please change your password</h3>
+                        <p>Since this is your first login on FishyFinds, you must set a new password.</p>
+                        <div class="ff-form-grid">
+                            <input type="password" placeholder="Old password" class="ff-field ff-field--wide" v-model="passwordDTO.oldPassword"/>
+                            <input type="password" placeholder="New password" class="ff-field ff-field--wide" v-model="passwordDTO.newPassword"/>
+                            <input type="password" placeholder="Confirm new password" class="ff-field ff-field--wide" v-model="confirmPassword"/>
+                        </div>
+                        <div class="ff-detail__toolbar" style="margin-top:1rem;">
+                            <button type="button" class="ff-btn ff-btn--primary" :disabled="!isCompletePassword" @click="savePassword">Update password</button>
+                        </div>
+                    </div>
                 </div>
 			</div>
 		</div>
@@ -176,8 +180,8 @@ template: `
                                       text: "You won't be able to revert this!",
                                       icon: 'warning',
                                       showCancelButton: true,
-                                      confirmButtonColor: '#3085d6',
-                                      cancelButtonColor: '#d33',
+                                      confirmButtonColor: '#ed1c24',
+                                      cancelButtonColor: '#6c6c6c',
                                       confirmButtonText: 'Yes, change my password!'
                                     }).then((result) => {
                                         if(result.isConfirmed){
@@ -206,47 +210,17 @@ template: `
 
 
                     }
-                },
-
-			loadMap: function () {
-
-					var myView = new ol.View({
-						center: [0,0],
-						zoom: 4
-					})
-
-					var myLayer = new ol.layer.Tile({
-						source: new ol.source.OSM()
-					})
-
-					var layer = [myLayer]
-
-					this.map = new ol.Map({
-						target: 'map',
-						layers: layer,
-						view: myView,
-						// style: myStyle
-					})
-
+                }
+	},
+	mounted(){
+		axios.defaults.headers.common["Authorization"] = localStorage.getItem("user");
+		axios.get("/api/authenticateUser")
+			.then(response => {
+				this.loggedUser = response.data || { userType: '' };
+				if (this.loggedUser && this.loggedUser.id) {
+					this.passwordDTO.id = this.loggedUser.id;
 				}
-
-
-    },
-
-    mounted(){
-
-		this.loadMap();
-
-        axios.defaults.headers.common["Authorization"] =
-                        localStorage.getItem("user");
-
-        axios.get("/api/authenticateUser")
-            .then(response =>{this.loggedUser = response.data; console.log(response.data)})
-            .catch(error => this.loggedUser.userType = "")
-        console.log(this.loggedUser);
-
-
-
-    }
-
+			})
+			.catch(() => { this.loggedUser = { userType: '' }; });
+	}
 });

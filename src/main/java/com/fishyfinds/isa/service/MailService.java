@@ -76,39 +76,167 @@ public class MailService {
     }
 
     public void sendCreationApprovalMail(String email) {
+        try {
+            String senderName = "Fishy Finds";
+            String subject = "Your registration was approved";
+            String body = "Dear advertiser,<br>"
+                    + "Your FishyFinds registration request has been approved. You can now sign in.<br>"
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
     }
 
     public void sendCreationDenyReasonEmail(User user, String explanation) {
+        try {
+            String senderName = "Fishy Finds";
+            String subject = "Your registration was rejected";
+            String body = "Dear [[name]],<br>"
+                    + "Your FishyFinds registration request was rejected for the following reason:<br>"
+                    + (explanation != null ? explanation : "") + "<br>"
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(user.getEmail());
+            helper.setSubject(subject);
+            helper.setText(body.replace("[[name]]", user.getFirstName() != null ? user.getFirstName() : "user"), true);
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
     }
 
-    public void sendSuccessfulReservationEmail(Customer user, Reservation reservation)
-            throws MessagingException, UnsupportedEncodingException {
+    public void sendComplaintResolutionEmail(String email, String name, String reply, boolean accepted, boolean toCustomer) {
+        try {
+            String senderName = "Fishy Finds";
+            String subject = accepted ? "Complaint resolved" : "Complaint response";
+            String roleNote = toCustomer ? "Your complaint" : "A complaint about your offer";
+            String body = "Dear [[name]],<br>"
+                    + roleNote + " has been " + (accepted ? "accepted" : "reviewed") + ".<br>"
+                    + "Admin reply:<br>" + (reply != null ? reply : "") + "<br>"
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(body.replace("[[name]]", name != null ? name : "user"), true);
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
+    }
 
-        String toAddress= user.getEmail();
-        String senderName= "Fishy Finds";
-        String subject = "Your reservation is successful.";
-        double discount = user.getLoyaltyProgram() != null ? user.getLoyaltyProgram().getCategoryDiscount() : 0;
-        String content = "Dear [[name]],<br>"
-                + "You made reservation for:<br>"
-                + reservation.getOffer().getOfferName() + "<br>"
-                + "Starting: " + reservation.getStartDate() + "<br>"
-                + "Ending: " + reservation.getEndDate() + "<br>"
-                + "Total price: " + reservation.getTotalPrice() + "<br>"
-                + "Discount: " + discount + "% <br>"
-                + "Fishy Finds.";
+    public void sendPenalDecisionEmail(String email, String name, boolean approved, String comment) {
+        try {
+            String senderName = "Fishy Finds";
+            String subject = approved ? "Penalty applied" : "Penalty request declined";
+            String body = "Dear [[name]],<br>"
+                    + (approved
+                        ? "A penalty has been applied based on a visit report.<br>"
+                        : "A requested penalty from a visit report was declined.<br>")
+                    + (comment != null ? ("Details: " + comment + "<br>") : "")
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(body.replace("[[name]]", name != null ? name : "user"), true);
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
+    }
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
+    public void sendSuccessfulReservationEmail(Customer user, Reservation reservation) {
+        try {
+            String toAddress= user.getEmail();
+            String senderName= "Fishy Finds";
+            String subject = "Your reservation is successful.";
+            double discount = user.getLoyaltyProgram() != null ? user.getLoyaltyProgram().getCategoryDiscount() : 0;
+            String content = "Dear [[name]],<br>"
+                    + "You made reservation for:<br>"
+                    + reservation.getOffer().getOfferName() + "<br>"
+                    + "Starting: " + reservation.getStartDate() + "<br>"
+                    + "Ending: " + reservation.getEndDate() + "<br>"
+                    + "Total price: " + reservation.getTotalPrice() + "<br>"
+                    + "Discount: " + discount + "% <br>"
+                    + "Fishy Finds.";
 
-        helper.setFrom(fromAddress, senderName);
-        helper.setTo(toAddress);
-        helper.setSubject(subject);
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
 
-        content = content.replace("[[name]]", user.getFirstName());
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
 
-        helper.setText(content, true);
+            content = content.replace("[[name]]", user.getFirstName());
 
-        mailSender.send(message);
+            helper.setText(content, true);
 
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void sendNewActionEmail(Customer user, Reservation action) {
+        try {
+            String toAddress = user.getEmail();
+            String senderName = "Fishy Finds";
+            String subject = "New special action on an offer you follow";
+            String offerName = action.getOffer() != null ? action.getOffer().getOfferName() : "an offer";
+            String content = "Dear [[name]],<br>"
+                    + "A new quick action is available for <strong>" + offerName + "</strong>.<br>"
+                    + "Start: " + action.getStartDate() + "<br>"
+                    + "End: " + action.getEndDate() + "<br>"
+                    + "Price: " + action.getTotalPrice() + "<br>"
+                    + "Discount: " + action.getDiscount() + "%<br>"
+                    + "Log in to Fishy Finds to book it.<br>"
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(toAddress);
+            helper.setSubject(subject);
+            helper.setText(content.replace("[[name]]", user.getFirstName() != null ? user.getFirstName() : "customer"), true);
+
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
+    }
+
+    public void sendFeedbackApprovedEmail(String ownerEmail, String content) {
+        try {
+            String senderName = "Fishy Finds";
+            String subject = "Feedback approved";
+            String body = "Dear owner,<br>"
+                    + "A customer feedback for your offer has been approved:<br>"
+                    + content + "<br>"
+                    + "Best regards,<br>"
+                    + "Fishy Finds.";
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message);
+
+            helper.setFrom(fromAddress, senderName);
+            helper.setTo(ownerEmail);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+
+            mailSender.send(message);
+        } catch (Exception ignored) {
+        }
     }
 }

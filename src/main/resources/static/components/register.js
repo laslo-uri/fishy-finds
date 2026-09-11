@@ -16,97 +16,68 @@ Vue.component('register', {
 		    },
 		    confirmPassword : "",
 		    enabled: false,
-		    backgroundColor: "seagreen",
+		    backgroundColor: "#ed1c24",
             registrationTitle: "",
 		    cursorStyle: "default",
             showForm: 0,
 		}
 	},
-template: `	
-		<div>
+template: `
+		<div class="ff-catalog">
             <nav-bar></nav-bar>
-
-            <div class="col-md-4 left-div" style="margin-top:-20px">
-                    <p class="title-text-bold" style="margin-top:30px;"> Registration </p>
-                    <div class="row">
-                        <p class="title-text-light">Create an account!</p>
-                        <p class="title-text-light" style="font-size:15px;">Register to FishyFinds:</p>
-                            </div>
-                            <div class="row options justify-content-evenly">
-                                <div class="options-4-horizontal justify-content-center" @click="registerCustomer">
-                                    <img class="image" src="images/register-customer.png">
-                                    <p class="title-text-bold" style="font-size:12px"> as a Customer </p>
-                                </div>
-                                <div class="options-4-horizontal justify-content-center" @click="registerBungalowOwner">
-                                    <img class="image" src="images/register-bungalow-owner.png">
-                                    <p class="title-text-bold" style="font-size:12px"> as a Bungalow Owner </p>
-                                </div>
-                                <div class="options-4-horizontal justify-content-center" @click="registerBoatOwner">
-                                    <img class="image" src="images/register-boat-owner.png">
-                                    <p class="title-text-bold" style="font-size:12px"> as a Boat Owner </p>
-                                </div>
-                                <div class="options-4-horizontal justify-content-center" @click="registerInstructor">
-                                    <img class="image" src="images/register-instructor.png">
-                                    <p class="title-text-bold" style="font-size:12px"> as an Instructor </p>
-                                </div>
-                    </div>
-            </div>
-
-            <div class="col-md-4 right-div" style="margin-top:-20px" v-show="showForm == 1 || showForm == 2 || showForm == 3">
-                <div class="container align-items-start">
-                    <p class="title-text-bold" style="margin-top:10px;"> {{registrationTitle}} </p>
-                    <form class="justify-content-center">
-                        <table class="justify-content-center" style="width:75%; margin: auto; table-layout:fixed;" >
-                            <tr>
-                                <td><input type="text" placeholder="   First name" class="input-text" v-model="dto.firstName"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Last name" class="input-text"  v-model="dto.lastName"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Address" class="input-text"  v-model="dto.address"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   City" class="input-text"  v-model="dto.city"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Country" class="input-text"  v-model="dto.country"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   Phone number" class="input-text"  v-model="dto.phoneNumber" /></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="text" placeholder="   E-mail" class="input-text"  v-model="dto.email" /></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="password" placeholder="   Password" class="input-text"  v-model="dto.password"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="password" placeholder="   Confirm password" class="input-text"  v-model="confirmPassword"/></td>
-                            </tr>
-                            <br>
-                            <tr v-show="showForm == 2 || showForm == 3">
-                                <textarea rows="5" name="text" placeholder="   Reasoning" class="input-text"  v-model="dto.reasoning" ></textarea>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}" :disabled="!isComplete" class="confirm" type="button" value="Register" @click="registerUser"/></td>
-                            </tr>
-                        </table>
-                    </form>
+            <section class="ff-catalog__shell">
+                <div class="ff-section-head">
+                    <h2>Registration</h2>
+                    <p>Create a FishyFinds account as a guest or service provider.</p>
                 </div>
-            </div>
+
+                <div class="ff-role-grid">
+                    <button type="button" class="ff-role-card" @click="registerCustomer">
+                        <img src="images/hero-harbor.png" alt="">
+                        <strong>Customer</strong>
+                        <span>Book stays, boats, and courses</span>
+                    </button>
+                    <button type="button" class="ff-role-card" @click="registerBungalowOwner">
+                        <img src="images/homepage-bungalows.png" alt="">
+                        <strong>Bungalow owner</strong>
+                        <span>List and manage bungalows</span>
+                    </button>
+                    <button type="button" class="ff-role-card" @click="registerBoatOwner">
+                        <img src="images/homepage-boats.png" alt="">
+                        <strong>Boat owner</strong>
+                        <span>List and manage boats</span>
+                    </button>
+                    <button type="button" class="ff-role-card" @click="registerInstructor">
+                        <img src="images/homepage-courses.png" alt="">
+                        <strong>Instructor</strong>
+                        <span>Publish fishing courses</span>
+                    </button>
+                </div>
+
+                <div class="ff-detail" v-show="showForm == 1 || showForm == 2 || showForm == 3" style="margin-top:1.5rem;">
+                    <h3 class="ff-detail__title">{{ registrationTitle }}</h3>
+                    <div class="ff-form-grid">
+                        <input type="text" placeholder="First name" class="ff-field" v-model="dto.firstName"/>
+                        <input type="text" placeholder="Last name" class="ff-field" v-model="dto.lastName"/>
+                        <input type="text" placeholder="Address" class="ff-field" v-model="dto.address"/>
+                        <input type="text" placeholder="City" class="ff-field" v-model="dto.city"/>
+                        <input type="text" placeholder="Country" class="ff-field" v-model="dto.country"/>
+                        <input type="text" placeholder="Phone number" class="ff-field" v-model="dto.phoneNumber"/>
+                        <input type="email" placeholder="E-mail" class="ff-field" v-model="dto.email"/>
+                        <input type="password" placeholder="Password (min 8)" class="ff-field" v-model="dto.password"/>
+                        <input type="password" placeholder="Confirm password" class="ff-field" v-model="confirmPassword"/>
+                        <textarea v-show="showForm == 2 || showForm == 3" rows="4" placeholder="Reasoning for registration" class="ff-field ff-field--wide" v-model="dto.reasoning"></textarea>
+                    </div>
+                    <button
+                        type="button"
+                        class="ff-btn ff-btn--primary"
+                        :disabled="!isComplete"
+                        :style="{'background-color':backgroundColor, 'cursor':cursorStyle, 'margin-top':'1rem'}"
+                        @click="registerUser">Register</button>
+                </div>
+            </section>
 		</div>
-		`
-	,
+		`,
 	computed : {
 	      isComplete () {
         		    correctFirstName = /\S/.test(this.dto.firstName) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,0-9]{1,20}$/.test(this.dto.firstName);
@@ -121,7 +92,7 @@ template: `
         		    /\S/.test(this.confirmPassword)
         		    && this.dto.password.length >= 8;
 
-        		    this.backgroundColor = flag ? "seagreen" : "#2e4f3c";
+        		    this.backgroundColor = flag ? "#ed1c24" : "#c9a0a2";
         		    this.cursorStyle = flag ? "pointer" : "default";
         		    return flag;
         		  }
@@ -132,44 +103,40 @@ template: `
                 axios.post('/api/registerUser', this.dto)
                 	 .then(response => {
                 	            if(response.data === true){
-                	                Swal.fire('Registered successfuly!',
-                	                          'Please, check your email for further instructions!',
+                	                Swal.fire('Registered successfully!',
+                	                          'Please check your email for further instructions.',
                 	                          'success')
                 	            }
                 	            else{
-                	                Swal.fire('Ooops, something went wrong!',
-                	                           'Please, try again later',
+                	                Swal.fire('Something went wrong!',
+                	                           'Please try again later.',
                 	                           'error')
                 	            }
                 	        })
             }
             else{
-                Swal.fire('Invalid password!',
-                                	                           '',
-                                	                           'error')
+                Swal.fire('Passwords do not match!', '', 'error')
             }
         },
         registerCustomer : function(){
             this.showForm = 1;
             this.dto.userType = "CUSTOMER";
-            this.registrationTitle = "Customer Registration";
+            this.registrationTitle = "Customer registration";
         },
         registerBungalowOwner : function(){
             this.showForm = 2;
             this.dto.userType = "BUNGALOW_OWNER";
-            this.registrationTitle = "Bungalow Owner Registration";
+            this.registrationTitle = "Bungalow owner registration";
         },
         registerBoatOwner : function(){
             this.showForm = 2;
             this.dto.userType = "BOAT_OWNER";
-            this.registrationTitle = "Boat Owner Registration";
+            this.registrationTitle = "Boat owner registration";
         },
         registerInstructor : function(){
             this.showForm = 3;
             this.dto.userType = "INSTRUCTOR";
-            this.registrationTitle = "Instructor Registration";
+            this.registrationTitle = "Instructor registration";
         }
-
     }
-
 });

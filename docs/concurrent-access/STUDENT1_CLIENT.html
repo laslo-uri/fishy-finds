@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Concurrent Access — Student 1 (Customer)</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 2rem auto; line-height: 1.5; color: #222; }
+    h1, h2, h3 { font-family: Arial, sans-serif; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3rem; }
+    h2 { margin-top: 2rem; }
+    code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
+    @media print { body { margin: 1cm; } }
+  </style>
+</head>
+<body>
+  <h1>Concurrent Database Access — Student 1 (Customer / Natalija)</h1>
+  <p>Section 4.4 write-up for customer-side conflict scenarios in FishyFinds.</p>
+  <p>Relevant code: <code>ReservationController</code>, <code>ReservationService</code>, <code>Term</code> (<code>@Version</code>), <code>Reservation</code> (<code>@Version</code>),
+    <code>CustomerRepository</code> (pessimistic lock on <code>findByEmail</code>), <code>FeedbackService</code> / <code>FeedbackController</code>.</p>
+
+  <h2>1. Double booking the same term</h2>
+  <h3>Situation</h3>
+  <p>Two customers try to book overlapping date ranges on the same available term (same offer slot) at the same time.
+    Without concurrency control, both transactions can pass the <code>isFree</code> check and create two active reservations for the same period.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>POST /api/makeReservation</code> → <code>ReservationController.makeReservation</code></li>
+    <li><code>ReservationService.makeReservation</code> (<code>@Transactional</code>)</li>
+    <li>Entity: <code>Term</code> with <code>@Version</code> and a list of reservations; <code>Reservation</code> persisted then attached via <code>updateTermsReservation</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> via <code>@Version</code> on <code>Term</code>. When both transactions load the same term and both try to save an updated reservation list,
+    the second commit fails with <code>OptimisticLockException</code> / version conflict.</p>
+  <h3>Why chosen</h3>
+  <p>Term updates are relatively short and conflicts are infrequent compared to reads. Optimistic locking avoids holding row locks during the whole booking flow
+    and only rejects the losing writer. Version-column comparison is simpler than comparing all entity fields.</p>
+
+  <h2>2. Action (quick reservation) race</h2>
+  <h3>Situation</h3>
+  <p>Two customers claim the same predefined action (<code>ReservationType.QUICK</code>) in overlapping time.
+    The last writer would otherwise overwrite customer assignment and leave inconsistent ownership of the action.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>POST /api/makeReservationAction</code> → <code>ReservationController.makeReservationAction</code></li>
+    <li><code>ReservationService.makeReservationAction</code> (<code>@Transactional</code>)</li>
+    <li>Entity: <code>Reservation</code> with <code>@Version</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> via <code>@Version</code> on <code>Reservation</code>. Concurrent updates to the same action row cause a version mismatch;
+    only one customer successfully binds to the action.</p>
+  <h3>Why chosen</h3>
+  <p>The conflict is on a single mutable reservation row. A version counter on <code>Reservation</code> is the natural place for optimistic control.</p>
+
+  <h2>3. Cancel versus rebook</h2>
+  <h3>Situation</h3>
+  <p>A customer cancels a reservation while another flow tries to rebook the same offer/date window.
+    Race between <code>cancelReservation</code> and <code>makeReservation</code> / <code>makeReservationAction</code> can allow incorrect booking or block a legitimate rebook.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>POST /api/cancelReservation</code> → <code>ReservationService.cancelReservation</code></li>
+    <li><code>POST /api/makeReservation</code> / <code>makeReservationAction</code></li>
+    <li>Entities: <code>Reservation</code> (<code>@Version</code>), <code>CancelledReservation</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> on <code>Reservation</code> (<code>@Version</code>) for status/customer changes under <code>@Transactional</code>.</p>
+  <h3>Why chosen</h3>
+  <p>Cancel and book both mutate reservation state; optimistic versioning keeps the decision at commit time without long-held locks.</p>
+
+  <h2>Extra conflict: feedback submit while reservation cancelled</h2>
+  <h3>Situation</h3>
+  <p>A customer submits feedback while another concurrent path cancels that reservation.
+    Feedback might be attached to a cancelled reservation, or <code>hasFeedback</code> set on an invalid reservation.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>FeedbackController</code> → <code>FeedbackService.addFeedback</code></li>
+    <li><code>ReservationController</code> → <code>ReservationService.cancelReservation</code></li>
+    <li>Entities: <code>UserFeedback</code>, <code>Reservation</code> (<code>@Version</code>, <code>hasFeedback</code>)</li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> on <code>Reservation</code> when updating <code>hasFeedback</code>, plus business checks that status is still eligible.</p>
+  <h3>Why chosen</h3>
+  <p>Feedback and cancel touch the same reservation row; optimistic versioning matches other reservation mutations.</p>
+
+  <h2>Related: penalties versus reservation (pessimistic)</h2>
+  <p><code>CustomerRepository.findByEmail</code> uses <code>@Lock(LockModeType.PESSIMISTIC_WRITE)</code> with lock timeout <code>0</code>
+    so concurrent penalty updates and bookings cannot both succeed when the three-penalty limit would be exceeded.
+    Pessimistic locking was chosen because two different tables change together and a single <code>@Version</code> cannot cover the cross-table rule.</p>
+</body>
+</html>

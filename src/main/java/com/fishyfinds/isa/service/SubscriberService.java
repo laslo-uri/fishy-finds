@@ -4,9 +4,9 @@ import com.fishyfinds.isa.model.beans.Subscriber;
 import com.fishyfinds.isa.model.beans.offers.Offer;
 import com.fishyfinds.isa.model.beans.users.customers.Customer;
 import com.fishyfinds.isa.repository.SubscriberRepository;
-import com.fishyfinds.isa.repository.offersRepository.OfferRepository;
-import com.fishyfinds.isa.repository.usersRepository.CustomerRepository;
-import com.fishyfinds.isa.repository.usersRepository.UserRepository;
+import com.fishyfinds.isa.repository.offers.OfferRepository;
+import com.fishyfinds.isa.repository.users.CustomerRepository;
+import com.fishyfinds.isa.repository.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +29,17 @@ public class SubscriberService {
     public void addSubscription(Map<String, String> message){
         Subscriber subscriber = new Subscriber();
         Customer follower = (Customer)userRepository.findByEmail(message.get("user"));
-        Offer following = offerRepository.findById(Long.parseLong(message.get("id"))).orElseGet(null);
+        String offerKey = message.get("id");
+        if (offerKey == null || offerKey.isEmpty()) {
+            offerKey = message.get("offerId");
+        }
+        if (follower == null || offerKey == null || offerKey.isEmpty()) {
+            return;
+        }
+        Offer following = offerRepository.findById(Long.parseLong(offerKey)).orElse(null);
+        if (following == null) {
+            return;
+        }
         List<Subscriber> subByUser = subscriberRepository.findAllByFollower(follower);
         List<Subscriber> subByOff = subscriberRepository.findAllByFollowing(following);
 

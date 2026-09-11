@@ -43,11 +43,13 @@ public class FeedbackController {
     }
 
     @GetMapping("/allPendingFeedbacks")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<UserFeedback> findAllPending(){
         return feedbackService.findAllPending();
     }
 
     @GetMapping("/allAcceptedFeedbacks")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<UserFeedback> findAllAcceptedFeedbacks(){
         return feedbackService.findAllAcceptedFeedbacks();
     }
@@ -62,12 +64,22 @@ public class FeedbackController {
     }
 
     @PostMapping("/acceptFeedback")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean acceptFeedback(@RequestBody Map<String, String> message){
-        return false;
+        try {
+            return feedbackService.acceptFeedback(Long.parseLong(message.get("id")));
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @PostMapping("/declineFeedback")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean declineFeedback(@RequestBody Map<String, String> message){
-        return false;
+        try {
+            return feedbackService.declineFeedback(Long.parseLong(message.get("id")));
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

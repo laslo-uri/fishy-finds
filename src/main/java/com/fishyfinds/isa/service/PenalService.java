@@ -4,7 +4,7 @@ import com.fishyfinds.isa.model.beans.Penal;
 import com.fishyfinds.isa.model.beans.users.User;
 import com.fishyfinds.isa.model.beans.users.customers.Customer;
 import com.fishyfinds.isa.repository.PenalRepository;
-import com.fishyfinds.isa.repository.usersRepository.UserRepository;
+import com.fishyfinds.isa.repository.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,15 @@ public class PenalService {
     @Transactional
     public Penal getPenalForUser(String username) {
         Customer customer = (Customer) userRepository.findByEmail(username);
-        return penalRepository.findByCustomer(customer);
+        if (customer == null) {
+            return null;
+        }
+        Penal penal = penalRepository.findByCustomer(customer);
+        if (penal == null) {
+            addNewPenal(customer);
+            penal = penalRepository.findByCustomer(customer);
+        }
+        return penal;
     }
 
     @Scheduled(cron = "@monthly")

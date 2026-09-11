@@ -1,6 +1,6 @@
 package com.fishyfinds.isa.controllers;
 
-import com.fishyfinds.isa.controllers.usersController.UserController;
+import com.fishyfinds.isa.controllers.users.UserController;
 import com.fishyfinds.isa.mappers.DtoToAccountDeletionRequest;
 import com.fishyfinds.isa.mappers.DtoToResolveDeleteRequest;
 import com.fishyfinds.isa.model.beans.AccountDeletionRequest;
@@ -72,23 +72,25 @@ public class AccountDeletionRequestController {
     }
 
     @GetMapping("/getAllCreationPendingRequests")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<AccountDeletionRequest> getAllCreationPendingRequests(){
         return accountDeletionRequestService.findAllCreationPending();
     }
 
     @PostMapping("/approveCreationRequest")
-    public boolean approveCreationRequest(@RequestBody AccountDeletionRequest request){
-        boolean retVal = false;
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public boolean approveCreationRequest(@RequestBody Map<String, String> message){
         try{
-            accountDeletionRequestService.approveCreationRequest(request);
-            retVal = true;
+            Long requestId = Long.parseLong(message.get("requestId") != null ? message.get("requestId") : message.get("id"));
+            return accountDeletionRequestService.approveCreationRequest(requestId);
         }catch(Exception e){
             e.printStackTrace();
+            return false;
         }
-        return retVal;
     }
 
     @PostMapping("/denyCreationRequest")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public boolean denyCreationRequest(@RequestBody Map<String, String> message){
         try{
             return accountDeletionRequestService.denyCreationRequest(DtoToResolveDeleteRequest.MapToResolveRequest(message));

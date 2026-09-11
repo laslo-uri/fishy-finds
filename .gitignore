@@ -31,3 +31,11 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Local scratch (do not commit) ###
+_spec_extract/
+*.bak
+*.bak-dates
+src/main/resources/data-postgres.sql.bak-dates
+scripts/audit_frontend.py
+scripts/probe_crf_design.py

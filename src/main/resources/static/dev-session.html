@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FishyFinds session bootstrap</title>
+</head>
+<body>
+<p>Setting session…</p>
+<script>
+(async function () {
+  const params = new URLSearchParams(location.search);
+  const email = params.get('email');
+  const password = params.get('password') || 'password';
+  const redirect = params.get('redirect') || '/';
+  if (!email) {
+    document.body.textContent = 'Missing email query param';
+    return;
+  }
+  try {
+    const signIn = await fetch('/api/signIn', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    if (!signIn.ok) throw new Error('signIn failed ' + signIn.status);
+    const token = await signIn.json();
+    localStorage.setItem('user', JSON.stringify(token));
+    const authHeader = localStorage.getItem('user');
+    const me = await fetch('/api/authenticateUser', {
+      headers: { Authorization: authHeader }
+    });
+    if (!me.ok) throw new Error('authenticateUser failed ' + me.status);
+    const logged = await me.json();
+    localStorage.setItem('loggedUser', JSON.stringify(logged));
+    location.replace(redirect);
+  } catch (e) {
+    document.body.textContent = String(e);
+  }
+})();
+</script>
+</body>
+</html>

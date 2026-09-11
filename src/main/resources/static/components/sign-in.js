@@ -5,44 +5,22 @@ Vue.component('sign-in', {
 		        email : "",
 		        password : ""
 		    },
-		    backgroundColor : "seagreen",
+		    backgroundColor : "#ed1c24",
             cursorStyle : "default"
 		}
 	},
 template: `	
 		<div>
             <nav-bar></nav-bar>
-            <div class="container">
-                <div class="row">
-                    <div class="d-flex justify-content-evenly align-items-center reg-form">
-                        <img  src="images/fishy-finds-logo.png" style="height: 36px; width:auto; margin-top:45px;">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="d-flex justify-content-evenly align-items-center reg-form"> 
-                        <h1 class="d-inline align-middle" style="font-family: poppins-bold; font-size: 20px; text-align: center; color:#fff;">Hello Again!</h1>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="d-flex justify-content-evenly align-items-center reg-form"> 
-                        <h3 class="d-inline align-middle" style="font-family: poppins-light; font-size: 12px; text-align: center; color:#fff;"> Welcome back, you've <br> been missed!</h3>
-                    </div>
-                </div>
-                <div class="row">
-                    <form class="d-flex justify-content-evenly align-items-center reg-form">    
-                        <table style="margin-top: 10px;">
-                            <tr>
-                                <td><input type="text" placeholder="   E-mail" class="input-text" v-model="user.email"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input type="password" placeholder="   Password" class="input-text" v-model="user.password"/></td>
-                            </tr>
-                            <br>
-                            <tr>
-                                <td><input :disabled="!isComplete" @click="signIn" v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}"  class="confirm" type="button" value="Sign in" /></td>
-                            </tr>
-                        </table>
+            <div class="ff-auth">
+                <div class="ff-auth__panel">
+                    <img class="ff-auth__mark" src="images/fishy-finds-logo.png" alt="FishyFinds">
+                    <h1 class="ff-auth__title">Sign in</h1>
+                    <p class="ff-auth__sub">Access stays, charters, and guided fishing days.</p>
+                    <form @submit.prevent="signIn">
+                        <input type="email" placeholder="Email" class="ff-field" v-model="user.email"/>
+                        <input type="password" placeholder="Password" class="ff-field" v-model="user.password"/>
+                        <input :disabled="!isComplete" @click="signIn" v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}" class="ff-btn ff-btn--primary" type="button" value="Sign in" />
                     </form>
                 </div>
             </div>
@@ -52,7 +30,7 @@ template: `
         computed : {
             isComplete () {
                 flag = /\S/.test(this.user.email) && /\S/.test(this.user.password);
-                this.backgroundColor = flag ? "seagreen" : "#2e4f3c";
+                this.backgroundColor = flag ? "#ed1c24" : "#c9a0a2";
                 this.cursorStyle = flag ? "pointer" : "default";
                 return flag;
             }
@@ -69,8 +47,10 @@ template: `
                             window.localStorage.setItem('loggedUser',JSON.stringify(response.data));
                             router.push('/')
                            })
+                           .catch(() => Swal.fire('Signed in, but profile load failed.', 'Try refreshing.', 'warning'))
 
                      })
+                     .catch(() => Swal.fire('Sign in failed!', 'Check your email and password.', 'error'))
              }
         }
 });

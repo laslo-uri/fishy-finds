@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Concurrent Access — Student 3 (Admin / Instructor)</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 800px; margin: 2rem auto; line-height: 1.5; color: #222; }
+    h1, h2, h3 { font-family: Arial, sans-serif; }
+    h1 { border-bottom: 2px solid #333; padding-bottom: 0.3rem; }
+    h2 { margin-top: 2rem; }
+    code { background: #f4f4f4; padding: 0.1rem 0.3rem; }
+    table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+    th, td { border: 1px solid #ccc; padding: 0.4rem 0.6rem; text-align: left; }
+    @media print { body { margin: 1cm; } }
+  </style>
+</head>
+<body>
+  <h1>Concurrent Database Access — Student 3 (Admin / Instructor / Jandric)</h1>
+  <p>Section 4.4 write-up for admin and instructor conflict scenarios in FishyFinds.</p>
+  <p>Relevant code: <code>ComplaintController</code>, <code>ComplaintService</code>, <code>AccountDeletionRequestService</code>,
+    <code>LoyaltyProgramController</code>, <code>LoyaltyProgramService</code>, instructor booking with <code>Term</code> <code>@Version</code>.</p>
+
+  <h2>1. Two admins answering the same complaint</h2>
+  <h3>Situation</h3>
+  <p>Two administrators accept or deny the same pending complaint concurrently, risking double responses or overwritten status.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>ComplaintController</code>: <code>acceptComplaint</code>, <code>denyComplaint</code>, <code>allPendingComplaints</code></li>
+    <li><code>ComplaintService.acceptComplaint</code> / <code>denyComplaint</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic status check</strong>: update only if status is still <code>PENDING</code>; optionally add <code>@Version</code> on <code>Complaint</code>.</p>
+  <h3>Why chosen</h3>
+  <p>Complaint resolution is a single-row status transition; only one admin should win.</p>
+
+  <h2>2. Two admins answering the same deletion request</h2>
+  <h3>Situation</h3>
+  <p>Two admins accept/deny the same account deletion or creation request, causing conflicting emails or inconsistent status.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>AccountDeletionRequestService.updateRequest</code>, <code>denyDeleteRequest</code></li>
+    <li><code>approveCreationRequest</code> / <code>denyCreationRequest</code></li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p>Conditional update from <code>PENDING</code> / <code>PENDING_CREATION</code> only; second admin aborts if status already terminal.</p>
+  <h3>Why chosen</h3>
+  <p>Status machine naturally serializes decisions without long locks during mail sending.</p>
+
+  <h2>3. Instructor action versus client reserve</h2>
+  <h3>Situation</h3>
+  <p>An instructor defines a quick action or term on a course while a client books overlapping capacity.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li>Instructor: <code>POST /api/createQuickAction</code> → <code>ReservationController.createQuickAction</code> → <code>ReservationService.createQuickAction</code></li>
+    <li><code>TermService</code> / related reservation APIs</li>
+    <li><code>ReservationService.makeReservation</code> / <code>makeReservationAction</code></li>
+    <li><code>Term</code> and <code>Reservation</code> with <code>@Version</code></li>
+  </ul>
+  <h3>Note on <code>createQuickAction</code></h3>
+  <p>Instructors share <code>createQuickAction</code> with owners: concurrent <code>createQuickAction</code> vs client <code>makeReservation</code>
+    can both observe free capacity and commit overlapping ACTIVE reservations.
+    Rely on <code>@Version</code> on <code>Reservation</code>/<code>Term</code> (plus transactional overlap checks) so only one writer succeeds.</p>
+  <h3>Lock approach</h3>
+  <p><strong>Optimistic locking</strong> via <code>@Version</code> on <code>Term</code> and <code>Reservation</code>.</p>
+  <h3>Why chosen</h3>
+  <p>Same shared state as owner/client races; existing version columns apply.</p>
+
+  <h2>Extra: two admins deleting the same loyalty category</h2>
+  <h3>Situation</h3>
+  <p>Two admins call <code>deleteLoyaltyCategory</code> for the same id; create path may also race on category name.</p>
+  <h3>Endpoints / classes</h3>
+  <ul>
+    <li><code>LoyaltyProgramController</code> → <code>LoyaltyProgramService.deleteLoyalty</code> / <code>addNewLoyalty</code></li>
+    <li><code>checkIfExists</code> uniqueness on create</li>
+  </ul>
+  <h3>Lock approach</h3>
+  <p>Idempotent delete by id; unique category name (and DB unique constraint recommended) on create.</p>
+  <h3>Why chosen</h3>
+  <p>Second delete is a no-op if the row is gone; name checks reduce duplicate categories.</p>
+
+  <h2>Summary</h2>
+  <table>
+    <tr><th>Scenario</th><th>Primary classes</th><th>Control</th></tr>
+    <tr><td>Same complaint</td><td><code>ComplaintController</code>, <code>ComplaintService</code></td><td>Conditional status / version</td></tr>
+    <tr><td>Same deletion request</td><td><code>AccountDeletionRequestService</code></td><td>Conditional status</td></tr>
+    <tr><td>Instructor vs client</td><td><code>ReservationService</code>, <code>Term</code></td><td><code>@Version</code></td></tr>
+    <tr><td>Loyalty delete</td><td><code>LoyaltyProgramController</code></td><td>Idempotent delete</td></tr>
+  </table>
+</body>
+</html>

@@ -8,9 +8,9 @@ import com.fishyfinds.isa.model.beans.users.User;
 import com.fishyfinds.isa.model.enums.ComplaintStatus;
 import com.fishyfinds.isa.model.enums.ComplaintType;
 import com.fishyfinds.isa.repository.ComplaintRepository;
-import com.fishyfinds.isa.repository.offersRepository.OfferRepository;
-import com.fishyfinds.isa.repository.termsRepository.ReservationRepository;
-import com.fishyfinds.isa.repository.usersRepository.UserRepository;
+import com.fishyfinds.isa.repository.offers.OfferRepository;
+import com.fishyfinds.isa.repository.terms.ReservationRepository;
+import com.fishyfinds.isa.repository.users.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +29,9 @@ public class ComplaintService {
 
     @Autowired
     private ComplaintRepository complaintRepository;
+
+    @Autowired
+    private MailService mailService;
 
     public boolean add(String username, String content, String reservationId, String complaintType) {
         User user = userRepository.findByEmail(username);
@@ -66,28 +69,53 @@ public class ComplaintService {
     }
 
     public boolean acceptComplaint(ResolveComplaintRequest mapToResolveRequest) {
-
         Complaint c = complaintRepository.findById(mapToResolveRequest.getComplaintId().intValue()).orElse(null);
         if(c == null){
             return false;
-        }else{
-            c.setStatus(ComplaintStatus.ACCEPTED);
-            complaintRepository.save(c);
-            return true;
         }
+        c.setStatus(ComplaintStatus.ACCEPTED);
+        complaintRepository.save(c);
+        sendComplaintEmails(c, mapToResolveRequest.getContent(), true);
+        return true;
     }
 
 
     public boolean denyComplaint(ResolveComplaintRequest mapToResolveRequest) {
-
         Complaint c = complaintRepository.findById(mapToResolveRequest.getComplaintId().intValue()).orElse(null);
         if(c==null){
             return false;
-        }else{
-            c.setStatus(ComplaintStatus.DECLINED);
-            complaintRepository.save(c);
-            return true;
         }
+        c.setStatus(ComplaintStatus.DECLINED);
+        complaintRepository.save(c);
+        sendComplaintEmails(c, mapToResolveRequest.getContent(), false);
+        return true;
+    }
 
+    private void sendComplaintEmails(Complaint complaint, String adminReply, boolean accepted) {
+        try {
+            Reservation reservation = complaint.getReservation();
+            if (reservation == null) {
+                return;
+            }
+            String reply = adminReply != null ? adminReply : "";
+            if (reservation.getCustomer() != null && reservation.getCustomer().getEmail() != null) {
+                mailService.sendComplaintResolutionEmail(
+                        reservation.getCustomer().getEmail(),
+                        reservation.getCustomer().getFirstName(),
+                        reply,
+                        accepted,
+                        true);
+            }
+            if (reservation.getOffer() != null && reservation.getOffer().getUser() != null
+                    && reservation.getOffer().getUser().getEmail() != null) {
+                mailService.sendComplaintResolutionEmail(
+                        reservation.getOffer().getUser().getEmail(),
+                        reservation.getOffer().getUser().getFirstName(),
+                        reply,
+                        accepted,
+                        false);
+            }
+        } catch (Exception ignored) {
+        }
     }
 }
