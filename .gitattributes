@@ -1,0 +1,8 @@
+# Unix scripts must stay LF or Linux CI rejects the shebang.
+mvnw text eol=lf
+*.sh text eol=lf
+mvnw.cmd text eol=crlf
+
+# Wrapper / local jars must not be treated as text.
+.mvn/wrapper/maven-wrapper.jar binary
+lib/*.jar binary
