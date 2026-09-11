@@ -1174,6 +1174,7 @@ div.right-div {
   width: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  object-position: center;
   margin-bottom: 0.35rem;
   background: var(--ff-soft);
 }

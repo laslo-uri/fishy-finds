@@ -123,22 +123,22 @@ template: `
 
 				<div class="ff-role-grid" v-if="loggedUser.numberOfLogIns > 0" style="padding: 1rem;">
 					<a class="ff-role-card" href="/admin">
-						<img src="images/admin-registrations.png" alt="">
+						<img src="images/tile-directory.png" alt="Admin dashboard">
 						<strong>Admin home</strong>
 						<span>Open all moderation and finance tools</span>
 					</a>
 					<a class="ff-role-card" href="/admin/registrations">
-						<img src="images/admin-user-requests.jpg" alt="">
+						<img src="images/tile-registrations.png" alt="Registrations">
 						<strong>Registrations</strong>
 						<span>Approve or reject advertiser sign-ups</span>
 					</a>
 					<a class="ff-role-card" href="/admin-loyalty">
-						<img src="images/admin-settings.png" alt="">
+						<img src="images/tile-loyalty.png" alt="Loyalty">
 						<strong>Loyalty &amp; income</strong>
 						<span>Categories and platform cut</span>
 					</a>
 					<a class="ff-role-card" href="/account">
-						<img src="images/admin-profile.png" alt="">
+						<img src="images/tile-register-admin.png" alt="Profile">
 						<strong>Profile</strong>
 						<span>Update account details and password</span>
 					</a>
