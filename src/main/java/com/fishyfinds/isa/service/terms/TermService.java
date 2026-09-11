@@ -22,12 +22,8 @@ public class TermService {
     private TermRepository termRepository;
 
     public List<TermDTO> filterAvailableTerms(LocalDateTime startDateFilter, LocalDateTime endDateFilter, String offerTypeFilter, int numberOfPeople) {
-        System.out.println("TermService - filterAvailableTerms()");
-        // parameters
-        // arrays
         List<TermDTO> allTermDTOs = findAllTermDTOs();
         List<TermDTO> filteredTermDTOs = new ArrayList<>();
-        // business logic
         for (TermDTO termDTO : allTermDTOs) {
             if (offerTypeFilter.equals(termDTO.offer.getOfferType().toString())
                     && (startDateFilter.isAfter(termDTO.startTime) || startDateFilter.isEqual(termDTO.startTime)) && !startDateFilter.isAfter(termDTO.endTime)
@@ -38,12 +34,8 @@ public class TermService {
         return filteredTermDTOs.stream().filter(t -> t.getOffer().getMaxCustomerCapacity() >= numberOfPeople).collect(Collectors.toList());
     }
     public List<TermDTO> filterAvailableTerms(LocalDateTime startDateFilter, LocalDateTime endDateFilter, String offerTypeFilter) {
-        System.out.println("TermService - filterAvailableTerms()");
-        // parameters
-        // arrays
         List<TermDTO> allTermDTOs = findAllTermDTOs();
         List<TermDTO> filteredTermDTOs = new ArrayList<>();
-        // business logic
         for (TermDTO termDTO : allTermDTOs) {
             if (offerTypeFilter.equals(termDTO.offer.getOfferType().toString())
                     && (startDateFilter.isAfter(termDTO.startTime) || startDateFilter.isEqual(termDTO.startTime)) && !startDateFilter.isAfter(termDTO.endTime)
@@ -55,7 +47,6 @@ public class TermService {
     }
 
     public List<TermDTO> getTermsByOfferId(Long offerId){
-        System.out.println("TermService - getTermsByOfferId(Long offerId)");
         List<TermDTO> allTermDTOs = findAllTermDTOs();
         List<TermDTO> offerTermDTOs = new ArrayList<>();
         LocalDateTime today = LocalDateTime.now();

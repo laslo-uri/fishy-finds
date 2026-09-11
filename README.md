@@ -58,29 +58,49 @@ Official course specs (local copies under FTN course materials / team docs):
 
 ## Screenshots
 
-Product UI screenshots live in [`docs/screenshots/`](docs/screenshots/). Capture them after a local run with:
+Captures from the current build. The full set is in [`docs/screenshots/`](docs/screenshots/).
+
+### Guest
+
+![Guest homepage](docs/screenshots/01-guest-home.png)
+
+*Homepage — bungalows, boats, and instructor courses.*
+
+![Bungalow catalog](docs/screenshots/02-bungalows.png)
+
+*Public bungalow catalog with search and sort.*
+
+### Customer
+
+![Upcoming reservations](docs/screenshots/05-upcoming.png)
+
+*Upcoming reservations — cancel is allowed only when the start is at least three days away.*
+
+### Owner
+
+![Owner bungalow listings](docs/screenshots/06-owner-bungalows.png)
+
+*Owner listings — details, terms, actions, book-for-client, and delete.*
+
+![Occupancy calendar](docs/screenshots/07-owner-calendar.png)
+
+*Occupancy calendar and unavailable periods.*
+
+### Admin
+
+![Admin dashboard](docs/screenshots/09-admin-home.png)
+
+*Admin dashboard — registrations, complaints, reviews, penalties, loyalty, and income.*
+
+![System income](docs/screenshots/12-admin-income.png)
+
+*System cut and aggregated reservation income.*
+
+To recapture after a local run (`http://localhost:8080`):
 
 ```powershell
-# With the app at http://localhost:8080 and signed in as each seed role
 .\scripts\capture-screenshots.ps1
 ```
-
-Expected files (run `.\scripts\capture-screenshots.ps1` while the app is up, then re-capture signed-in pages after logging in as each seed role):
-
-| File | Screen |
-|------|--------|
-| `01-guest-home.png` | Guest homepage |
-| `02-bungalows.png` | Bungalow catalog |
-| `03-sign-in.png` | Sign in |
-| `04-make-reservation.png` | Customer booking |
-| `05-upcoming.png` | Upcoming reservations |
-| `06-owner-bungalows.png` | Owner listings |
-| `07-owner-calendar.png` | Occupancy calendar |
-| `08-owner-reports.png` | Owner reports |
-| `09-admin-home.png` | Admin dashboard |
-| `10-admin-registrations.png` | Registration queue |
-| `11-admin-complaints.png` | Complaints queue |
-| `12-admin-income.png` | Admin income |
 
 ## Run locally
 
