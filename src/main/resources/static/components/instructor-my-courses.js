@@ -95,7 +95,7 @@ Vue.component('instructor-my-courses', {
 					<div class="ff-product-grid">
 						<article class="ff-product" v-for="course in myCourses" :key="course.id">
 							<div class="ff-product__media">
-								<img v-if="course.images && course.images.length" :src="setImage(course.images[0])" :alt="course.offerName" />
+								<img v-if="course.images && course.images.length" :src="coverPath(course)" :alt="course.offerName" />
 								<img v-else src="images/no-pictures.jpg" alt="No photo" />
 							</div>
 							<div class="ff-product__body">
@@ -279,6 +279,18 @@ Vue.component('instructor-my-courses', {
 			axios.get('/api/getAllAdditionalServicesForBoatsAndCourses').then(response => {
 				this.allAdditionalServices = response.data || [];
 			});
+		},
+		coverPath(entity){
+			var images = entity && entity.images ? entity.images : [];
+			var cover = null;
+			for (var i = 0; i < images.length; i++) {
+				if (images[i] && images[i].name === 'first') {
+					cover = images[i];
+					break;
+				}
+			}
+			if (!cover && images.length) cover = images[0];
+			return this.setImage(cover);
 		},
 		setImage(image){
 			if (!image) {

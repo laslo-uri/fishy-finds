@@ -125,7 +125,7 @@ Vue.component('owner-my-boats', {
 					<div class="ff-product-grid">
 						<article class="ff-product" v-for="boat in myBoats" :key="boat.id">
 							<div class="ff-product__media">
-								<img v-if="boat.images && boat.images.length" :src="setImage(boat.images[0])" :alt="boat.offerName" />
+								<img v-if="boat.images && boat.images.length" :src="coverPath(boat)" :alt="boat.offerName" />
 								<img v-else src="images/no-pictures.jpg" alt="No photo" />
 							</div>
 							<div class="ff-product__body">
@@ -355,6 +355,18 @@ Vue.component('owner-my-boats', {
 			axios.get('/api/getAllAdditionalServicesForBoatsAndCourses').then(response => {
 				this.allAdditionalServices = response.data || [];
 			});
+		},
+		coverPath(entity){
+			var images = entity && entity.images ? entity.images : [];
+			var cover = null;
+			for (var i = 0; i < images.length; i++) {
+				if (images[i] && images[i].name === 'first') {
+					cover = images[i];
+					break;
+				}
+			}
+			if (!cover && images.length) cover = images[0];
+			return this.setImage(cover);
 		},
 		setImage(image){
 			if (!image) {

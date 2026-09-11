@@ -141,7 +141,7 @@ template: `
 					<div class="ff-product-grid">
 						<article class="ff-product" v-for="bungalow in myBungalows" :key="bungalow.id">
 							<div class="ff-product__media">
-								<img v-if="bungalow.images && bungalow.images.length" :src="setImage(bungalow.images[0])" :alt="bungalow.offerName" />
+								<img v-if="bungalow.images && bungalow.images.length" :src="coverPath(bungalow)" :alt="bungalow.offerName" />
 								<img v-else src="images/no-pictures.jpg" alt="No photo" />
 							</div>
 							<div class="ff-product__body">
@@ -477,6 +477,18 @@ template: `
 				this.myBungalows = response.data
 				console.log(this.myBungalows)
 			})
+		},
+		coverPath(entity){
+			var images = entity && entity.images ? entity.images : [];
+			var cover = null;
+			for (var i = 0; i < images.length; i++) {
+				if (images[i] && images[i].name === 'first') {
+					cover = images[i];
+					break;
+				}
+			}
+			if (!cover && images.length) cover = images[0];
+			return this.setImage(cover);
 		},
 		setImage(image){
 			if (!image) {

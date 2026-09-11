@@ -308,7 +308,12 @@ Vue.component('bungalows', {
 		}
 	},
 	mounted() {
-		axios.defaults.headers.common['Authorization'] = localStorage.getItem('user');
+		var session = localStorage.getItem('user');
+		if (session) {
+			axios.defaults.headers.common['Authorization'] = session;
+		} else {
+			delete axios.defaults.headers.common['Authorization'];
+		}
 		axios.get('/api/allBungalows').then((response) => {
 			this.bungalows = response.data || [];
 			if (this.bungalows.length) this.bungalowToShow = this.bungalows[0];

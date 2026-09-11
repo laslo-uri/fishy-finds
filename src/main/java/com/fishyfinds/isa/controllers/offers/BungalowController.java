@@ -3,6 +3,7 @@ package com.fishyfinds.isa.controllers.offers;
 import com.fishyfinds.isa.dto.AddNewBungalowDTO;
 import com.fishyfinds.isa.dto.OfferDTO;
 import com.fishyfinds.isa.model.beans.Subscriber;
+import com.fishyfinds.isa.model.beans.offers.ImageItem;
 import com.fishyfinds.isa.model.beans.offers.bungalows.Bungalow;
 import com.fishyfinds.isa.model.beans.users.User;
 import com.fishyfinds.isa.security.TokenUtils;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(value="/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,38 +41,30 @@ public class BungalowController {
     private SubscriberService subscriberService;
 
     @GetMapping("/allBungalows")
-    public List<OfferDTO> findAll(@RequestHeader("Authorization") HttpHeaders header){
-        System.out.println("[BungalowController]-[api/allBungalows]");
+    public List<OfferDTO> findAll(@RequestHeader(value = "Authorization", required = false) HttpHeaders header){
         List<Bungalow> bungalows  = bungalowService.findAll();
         List<OfferDTO> retVal = new ArrayList<OfferDTO>();
+        List<Subscriber> subscribers = new ArrayList<Subscriber>();
         try {
-            final String value = header.getFirst(HttpHeaders.AUTHORIZATION);
-            if(value != null && !value.isEmpty()){
-            final JSONObject obj = new JSONObject(value);
-            String user = obj.getString("accessToken");
-            String username = tokenUtils.getUsernameFromToken(user);
-            List<Subscriber> subscribers = subscriberService.getSubscriptionsByUser(username);
-            for(Bungalow b : bungalows){
-                OfferDTO dto = new OfferDTO();
-                dto.setOffer(b);
-                dto.setPath(b.getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
-                for(Subscriber s : subscribers){
-                    if(s.isRelevant() && s.getFollowing().getId().equals(b.getId())){
-                        dto.setFollowed(true);
-                        break;
-                    }
-                }
-                retVal.add(dto);
-            }}
-            else{
-                for(Bungalow b : bungalows){
-                    OfferDTO dto = new OfferDTO();
-                    dto.setPath(b.getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
-                    dto.setOffer(b);
-                    retVal.add(dto);
+            final String value = header != null ? header.getFirst(HttpHeaders.AUTHORIZATION) : null;
+            if(value != null && !value.isEmpty() && value.trim().startsWith("{")){
+                final JSONObject obj = new JSONObject(value);
+                String username = tokenUtils.getUsernameFromToken(obj.getString("accessToken"));
+                subscribers = subscriberService.getSubscriptionsByUser(username);
+            }
+        }catch(Exception ignored){
+        }
+        for(Bungalow b : bungalows){
+            OfferDTO dto = new OfferDTO();
+            dto.setOffer(b);
+            dto.setPath(resolveFirstImage(b));
+            for(Subscriber s : subscribers){
+                if(s.isRelevant() && s.getFollowing().getId().equals(b.getId())){
+                    dto.setFollowed(true);
+                    break;
                 }
             }
-        }catch(Exception e){
+            retVal.add(dto);
         }
         return retVal;
     }
@@ -125,5 +118,15 @@ public class BungalowController {
             e.printStackTrace();
         }
         return false;
+    }
+
+    private String resolveFirstImage(Bungalow bungalow) {
+        if (bungalow.getImages() == null || bungalow.getImages().isEmpty()) {
+            return "images/no-pictures.png";
+        }
+        Optional<ImageItem> first = bungalow.getImages().stream()
+                .filter(i -> "first".equals(i.getName()))
+                .findFirst();
+        return first.map(ImageItem::getPath).orElse(bungalow.getImages().iterator().next().getPath());
     }
 }

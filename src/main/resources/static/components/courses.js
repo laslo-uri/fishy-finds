@@ -318,7 +318,12 @@ Vue.component('courses', {
 		}
 	},
 	mounted() {
-		axios.defaults.headers.common['Authorization'] = localStorage.getItem('user');
+		var session = localStorage.getItem('user');
+		if (session) {
+			axios.defaults.headers.common['Authorization'] = session;
+		} else {
+			delete axios.defaults.headers.common['Authorization'];
+		}
 		axios.get('/api/allCourses').then((response) => {
 			this.courses = response.data || [];
 			if (this.courses.length) this.courseToShow = this.courses[0];

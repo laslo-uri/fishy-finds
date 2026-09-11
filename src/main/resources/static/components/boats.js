@@ -308,7 +308,12 @@ Vue.component('boats', {
 		}
 	},
 	mounted() {
-		axios.defaults.headers.common['Authorization'] = localStorage.getItem('user');
+		var session = localStorage.getItem('user');
+		if (session) {
+			axios.defaults.headers.common['Authorization'] = session;
+		} else {
+			delete axios.defaults.headers.common['Authorization'];
+		}
 		axios.get('/api/allBoats').then((response) => {
 			this.boats = response.data || [];
 			if (this.boats.length) this.boatToShow = this.boats[0];
