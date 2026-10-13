@@ -103,7 +103,7 @@ class ReservationServiceCreateCancelTest {
         reservation.setStartDate(LocalDateTime.now().plusDays(1));
         when(reservationRepository.findById(9L)).thenReturn(Optional.of(reservation));
 
-        assertFalse(reservationService.cancelReservation(9L));
+        assertFalse(reservationService.cancelReservation(9L, "mail@mail.com"));
         verify(cancelledReservationRepositoty, never()).save(any());
     }
 
@@ -113,10 +113,13 @@ class ReservationServiceCreateCancelTest {
         reservation.setId(9L);
         reservation.setStartDate(LocalDateTime.now().plusDays(10));
         reservation.setReservationStatus(ReservationStatus.ACTIVE);
+        Customer customer = new Customer();
+        customer.setEmail("mail@mail.com");
+        reservation.setCustomer(customer);
         when(reservationRepository.findById(9L)).thenReturn(Optional.of(reservation));
         when(reservationRepository.save(any(Reservation.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        assertTrue(reservationService.cancelReservation(9L));
+        assertTrue(reservationService.cancelReservation(9L, "mail@mail.com"));
         assertEquals(ReservationStatus.CANCELLED, reservation.getReservationStatus());
         verify(cancelledReservationRepositoty).save(any());
     }

@@ -19,8 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BoatController {
@@ -104,12 +102,6 @@ public class BoatController {
     }
 
     private String resolveFirstImage(Boat boat) {
-        if (boat.getImages() == null || boat.getImages().isEmpty()) {
-            return "images/no-pictures.png";
-        }
-        Optional<ImageItem> first = boat.getImages().stream()
-                .filter(i -> "first".equals(i.getName()))
-                .findFirst();
-        return first.map(ImageItem::getPath).orElse(boat.getImages().iterator().next().getPath());
+        return ImageItem.firstPath(boat.getImages());
     }
 }

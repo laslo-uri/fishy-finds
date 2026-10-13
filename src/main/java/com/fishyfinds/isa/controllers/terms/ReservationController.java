@@ -102,8 +102,15 @@ public class ReservationController {
 
     @PostMapping("/cancelReservation")
     @PreAuthorize("hasRole('ROLE_CUSTOMER')")
-    public boolean cancelReservation(@RequestBody Map<String, String> id){
-        return reservationService.cancelReservation(Long.parseLong(id.get("id")));
+    public boolean cancelReservation(@RequestHeader HttpHeaders header, @RequestBody Map<String, String> id){
+        try {
+            final String value = header.getFirst(HttpHeaders.AUTHORIZATION);
+            final JSONObject obj = new JSONObject(value);
+            String username = tokenUtils.getUsernameFromToken(obj.getString("accessToken"));
+            return reservationService.cancelReservation(Long.parseLong(id.get("id")), username);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     @PostMapping("/historyOfReservationsForCustomer")

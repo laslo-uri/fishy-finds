@@ -206,12 +206,16 @@ public class ReservationService {
         }
     }
 
-    public boolean cancelReservation(Long id) {
+    public boolean cancelReservation(Long id, String username) {
         boolean retVal = true;
         try{
             Reservation reservation = reservationRepository.findById(id).orElse(null);
             LocalDateTime dateTimeNow = LocalDateTime.now();
-            if( reservation != null && dateTimeNow.plusDays(MAX_NUM_OF_DAYS_BEFORE_CANCELLING).isBefore(reservation.getStartDate())){
+            boolean owns = reservation != null
+                    && reservation.getCustomer() != null
+                    && reservation.getCustomer().getEmail() != null
+                    && reservation.getCustomer().getEmail().equalsIgnoreCase(username);
+            if( owns && dateTimeNow.plusDays(MAX_NUM_OF_DAYS_BEFORE_CANCELLING).isBefore(reservation.getStartDate())){
                 reservation.setReservationStatus(ReservationStatus.CANCELLED);
                 CancelledReservation cancelledReservation = new CancelledReservation(reservation);
                 reservation.setCustomer(null);

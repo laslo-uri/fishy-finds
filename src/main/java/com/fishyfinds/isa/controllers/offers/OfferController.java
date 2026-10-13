@@ -43,7 +43,9 @@ public class OfferController {
                                                  @RequestParam(name = "startDate", required = false) String startDate,
                                                  @RequestParam(name = "endDate", required = false) String endDate){
         List<? extends Offer> offers = new ArrayList<>();
-        if((startDate == null || startDate.equals("")) && (endDate == null || endDate.equals("")))
+        boolean startBlank = startDate == null || startDate.isEmpty();
+        boolean endBlank = endDate == null || endDate.isEmpty();
+        if(startBlank || endBlank)
             offers = offerService.search(name, location, type, firstAndLastName, null,null);
         else
             offers = offerService.search(name, location, type, firstAndLastName, LocalDateTime.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME),

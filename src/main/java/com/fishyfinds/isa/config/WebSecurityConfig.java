@@ -66,6 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/allCourses").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/getTermsByOfferId/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/allAcceptedFeedbacksForOffer").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/allAcceptedFeedbacksForOffer").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/getActionsForOffer").permitAll()
                 // Everything else under /api needs JWT
                 .antMatchers("/api/**").authenticated()

@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value="/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class BungalowController {
@@ -121,12 +119,6 @@ public class BungalowController {
     }
 
     private String resolveFirstImage(Bungalow bungalow) {
-        if (bungalow.getImages() == null || bungalow.getImages().isEmpty()) {
-            return "images/no-pictures.png";
-        }
-        Optional<ImageItem> first = bungalow.getImages().stream()
-                .filter(i -> "first".equals(i.getName()))
-                .findFirst();
-        return first.map(ImageItem::getPath).orElse(bungalow.getImages().iterator().next().getPath());
+        return ImageItem.firstPath(bungalow.getImages());
     }
 }

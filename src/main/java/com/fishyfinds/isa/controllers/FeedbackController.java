@@ -57,8 +57,11 @@ public class FeedbackController {
     @PostMapping("/allAcceptedFeedbacksForOffer")
     public List<UserFeedback> findAllAcceptedFeedbacksForOffer(@RequestBody Map<String, String> id){
         List<UserFeedback> retVal = feedbackService.findAllAcceptedFeedbacks();
+        long offerId = Long.parseLong(id.get("id"));
         return retVal != null ?
-            retVal.stream().filter(r -> r.getReservation().getOffer().getId() == Long.parseLong(id.get("id"))).collect(Collectors.toList())
+            retVal.stream().filter(r -> r.getReservation() != null
+                    && r.getReservation().getOffer() != null
+                    && r.getReservation().getOffer().getId() == offerId).collect(Collectors.toList())
             : new ArrayList<>();
 
     }

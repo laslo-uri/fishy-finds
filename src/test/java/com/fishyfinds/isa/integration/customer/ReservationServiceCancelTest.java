@@ -1,6 +1,7 @@
 package com.fishyfinds.isa.integration.customer;
 
 import com.fishyfinds.isa.model.beans.terms.Reservation;
+import com.fishyfinds.isa.model.beans.users.customers.Customer;
 import com.fishyfinds.isa.model.enums.ReservationStatus;
 import com.fishyfinds.isa.repository.LoyaltyProgramRepository;
 import com.fishyfinds.isa.repository.offers.OfferRepository;
@@ -41,7 +42,7 @@ class ReservationServiceCancelTest {
     @Test
     void cancelReturnsFalseWhenReservationMissing() {
         when(reservationRepository.findById(99L)).thenReturn(Optional.empty());
-        assertFalse(reservationService.cancelReservation(99L));
+        assertFalse(reservationService.cancelReservation(99L, "mail@mail.com"));
     }
 
     @Test
@@ -50,9 +51,12 @@ class ReservationServiceCancelTest {
         reservation.setId(1L);
         reservation.setStartDate(LocalDateTime.now().plusDays(10));
         reservation.setReservationStatus(ReservationStatus.ACTIVE);
+        Customer customer = new Customer();
+        customer.setEmail("mail@mail.com");
+        reservation.setCustomer(customer);
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-        assertTrue(reservationService.cancelReservation(1L));
+        assertTrue(reservationService.cancelReservation(1L, "mail@mail.com"));
         assertEquals(ReservationStatus.CANCELLED, reservation.getReservationStatus());
         verify(reservationRepository).save(reservation);
         verify(cancelledReservationRepositoty).save(any());

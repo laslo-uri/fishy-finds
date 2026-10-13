@@ -158,7 +158,7 @@ class RequirementsChecklistTest {
         @DisplayName("Cancel missing reservation fails safely")
         void cancelMissing() {
             when(reservationRepository.findById(999L)).thenReturn(Optional.empty());
-            assertFalse(reservationService.cancelReservation(999L));
+            assertFalse(reservationService.cancelReservation(999L, "mail@mail.com"));
         }
 
         @Test
@@ -168,9 +168,12 @@ class RequirementsChecklistTest {
             reservation.setId(1L);
             reservation.setStartDate(LocalDateTime.now().plusDays(10));
             reservation.setReservationStatus(ReservationStatus.ACTIVE);
+            Customer customer = new Customer();
+            customer.setEmail("mail@mail.com");
+            reservation.setCustomer(customer);
             when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
 
-            assertTrue(reservationService.cancelReservation(1L));
+            assertTrue(reservationService.cancelReservation(1L, "mail@mail.com"));
             assertEquals(ReservationStatus.CANCELLED, reservation.getReservationStatus());
             verify(cancelledReservationRepositoty).save(any());
         }
@@ -184,7 +187,7 @@ class RequirementsChecklistTest {
             reservation.setReservationStatus(ReservationStatus.ACTIVE);
             when(reservationRepository.findById(2L)).thenReturn(Optional.of(reservation));
 
-            assertFalse(reservationService.cancelReservation(2L));
+            assertFalse(reservationService.cancelReservation(2L, "mail@mail.com"));
             verify(reservationRepository, never()).save(any());
         }
     }

@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CourseController {
@@ -145,12 +143,6 @@ public class CourseController {
     }
 
     private String resolveFirstImage(Course course) {
-        if (course.getImages() == null || course.getImages().isEmpty()) {
-            return "images/no-pictures.png";
-        }
-        Optional<ImageItem> first = course.getImages().stream()
-                .filter(i -> "first".equals(i.getName()))
-                .findFirst();
-        return first.map(ImageItem::getPath).orElse(course.getImages().iterator().next().getPath());
+        return ImageItem.firstPath(course.getImages());
     }
 }
