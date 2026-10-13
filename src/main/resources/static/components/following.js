@@ -98,7 +98,7 @@ template: `
             search: function(){
                 this.offers = this.copyOfOffers;
                 let newArray = this.offers.filter(el => {
-                    let text = this.searchName;
+                    let text = this.searchName.toLowerCase();
                     return el.offer.offerName.toLowerCase().includes(text);
                 })
                 this.offers = newArray;

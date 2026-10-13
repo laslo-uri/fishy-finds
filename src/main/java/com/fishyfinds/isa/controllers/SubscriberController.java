@@ -2,6 +2,7 @@ package com.fishyfinds.isa.controllers;
 
 import com.fishyfinds.isa.dto.OfferDTO;
 import com.fishyfinds.isa.model.beans.Subscriber;
+import com.fishyfinds.isa.model.beans.offers.ImageItem;
 import com.fishyfinds.isa.security.TokenUtils;
 import com.fishyfinds.isa.service.SubscriberService;
 import org.json.JSONException;
@@ -15,8 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping(value="/api", produces= MediaType.APPLICATION_JSON_VALUE)
 public class SubscriberController {
@@ -53,7 +52,7 @@ public class SubscriberController {
             List<OfferDTO> offers = new ArrayList<>();
             for(Subscriber s : subscriberService.getSubscriptionsByUser(username)){
                 OfferDTO dto = new OfferDTO();
-                dto.setPath(s.getFollowing().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                dto.setPath(ImageItem.firstPath(s.getFollowing().getImages()));
                 dto.setOffer(s.getFollowing());
                 dto.setFollowed(s.isRelevant());
                 offers.add(dto);

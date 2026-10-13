@@ -18,8 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping(value="/api", produces= MediaType.APPLICATION_JSON_VALUE)
 public class TermController {
@@ -42,7 +40,7 @@ public class TermController {
         List<TermDTO> retVal =  termService.filterAvailableTerms(start, end, message.get("offerType"), Integer.parseInt(message.get("numberOfPeople")));
         if(retVal != null) {
             for (TermDTO d : retVal){
-                d.setPath(d.offer.getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                d.setPath(com.fishyfinds.isa.model.beans.offers.ImageItem.firstPath(d.offer.getImages()));
             }
         }
         return retVal;
@@ -63,6 +61,11 @@ public class TermController {
             String user = obj.getString("accessToken");
             String username = tokenUtils.getUsernameFromToken(user);
             Offer offer = offerService.findOfferByOfferId(offerId);
+            if (offer == null || offer.getUser() == null
+                    || offer.getUser().getEmail() == null
+                    || !offer.getUser().getEmail().equals(username)) {
+                return false;
+            }
             return termService.addNewTermToOffer(termDTO, offer);
         }catch(Exception e){
             e.printStackTrace();

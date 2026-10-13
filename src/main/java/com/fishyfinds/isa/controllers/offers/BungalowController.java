@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -71,7 +72,6 @@ public class BungalowController {
 
     @GetMapping("/allMyBungalows")
     public List<Bungalow> findAllByOwnerId(@RequestHeader("Authorization") HttpHeaders header) {
-        System.out.println("[BungalowController]-[api/allMyBungalows]");
         final String value =header.getFirst(HttpHeaders.AUTHORIZATION);
         final JSONObject obj;
         String user = "";
@@ -88,10 +88,9 @@ public class BungalowController {
     }
 
     @PostMapping("/addNewBungalow")
+    @PreAuthorize("hasRole('ROLE_BUNGALOW')")
     public boolean addNewBungalow(@RequestHeader("Authorization") HttpHeaders header,
                                   @RequestBody AddNewBungalowDTO addNewBungalowDto){
-        System.out.println("[BungalowController]-[api/addNewBungalow]");
-        System.out.println(addNewBungalowDto.toString());
         try {
             final String value =header.getFirst(HttpHeaders.AUTHORIZATION);
             final JSONObject obj = new JSONObject(value);
@@ -101,6 +100,7 @@ public class BungalowController {
             return bungalowService.addNewBungalow(addNewBungalowDto, username);
 
         }catch(Exception e){
+            e.printStackTrace();
         }
         return  false;
     }

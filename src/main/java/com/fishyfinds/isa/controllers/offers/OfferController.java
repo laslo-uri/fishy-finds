@@ -24,8 +24,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping(value="/api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class OfferController {
@@ -45,7 +43,7 @@ public class OfferController {
                                                  @RequestParam(name = "startDate", required = false) String startDate,
                                                  @RequestParam(name = "endDate", required = false) String endDate){
         List<? extends Offer> offers = new ArrayList<>();
-        if(startDate == null || startDate.equals("") && endDate == null || endDate.equals(""))
+        if((startDate == null || startDate.equals("")) && (endDate == null || endDate.equals("")))
             offers = offerService.search(name, location, type, firstAndLastName, null,null);
         else
             offers = offerService.search(name, location, type, firstAndLastName, LocalDateTime.parse(startDate, DateTimeFormatter.ISO_LOCAL_DATE_TIME),
@@ -60,7 +58,7 @@ public class OfferController {
                 List<Subscriber> subscribers = subscriberService.getSubscriptionsByUser(username);
                 for(Offer b : offers){
                     OfferDTO dto = new OfferDTO();
-                    dto.setPath(b.getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    dto.setPath(ImageItem.firstPath(b.getImages()));
                     dto.setOffer(b);
                     for(Subscriber s : subscribers){
                         if(s.isRelevant() && s.getFollowing().getId().equals(b.getId())){
@@ -73,13 +71,13 @@ public class OfferController {
             else{
                 for(Offer b : offers){
                     OfferDTO dto = new OfferDTO();
-                    dto.setPath(b.getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    dto.setPath(ImageItem.firstPath(b.getImages()));
                     dto.setOffer(b);
                     retVal.add(dto);
                 }
             }
         }catch(Exception e){
-
+            e.printStackTrace();
         }
         return retVal;
     }
@@ -104,6 +102,7 @@ public class OfferController {
             String username = tokenUtils.getUsernameFromToken(accessToken);
             return offerService.softDeleteOfferForOwner(Long.parseLong(message.get("id")), username);
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

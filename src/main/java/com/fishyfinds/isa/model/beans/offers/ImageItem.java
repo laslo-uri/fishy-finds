@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Getter
@@ -34,5 +35,22 @@ public class ImageItem {
         this.name = name;
         this.path = path;
         this.isDeleted = isDeleted;
+    }
+
+    public static String firstPath(Collection<ImageItem> images) {
+        if (images == null || images.isEmpty()) {
+            return "images/no-pictures.png";
+        }
+        for (ImageItem image : images) {
+            if (image != null && "first".equals(image.getName()) && image.getPath() != null) {
+                return image.getPath();
+            }
+        }
+        for (ImageItem image : images) {
+            if (image != null && image.getPath() != null) {
+                return image.getPath();
+            }
+        }
+        return "images/no-pictures.png";
     }
 }

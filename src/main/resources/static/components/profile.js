@@ -123,10 +123,10 @@ template: `
     ,
     computed : {
         isComplete () {
-            correctFirstName = /\S/.test(this.dto.firstName) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,0-9]{1,20}$/.test(this.dto.firstName);
-            correctLastName = /\S/.test(this.dto.lastName) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,0-9]{1,20}$/.test(this.dto.lastName);
-            correctPhoneNumber = /\S/.test(this.dto.phoneNumber) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,A-Za-z]{8,10}$/.test(this.dto.phoneNumber);
-            flag = correctFirstName && correctLastName && correctPhoneNumber &&
+            let correctFirstName = /\S/.test(this.dto.firstName) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,0-9]{1,20}$/.test(this.dto.firstName);
+            let correctLastName = /\S/.test(this.dto.lastName) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,0-9]{1,20}$/.test(this.dto.lastName);
+            let correctPhoneNumber = /\S/.test(this.dto.phoneNumber) && /^[^±!@£$%^&*_+§¡€#¢§¶•ªº«\\/<>?:;|=.,A-Za-z]{8,10}$/.test(this.dto.phoneNumber);
+            let flag = correctFirstName && correctLastName && correctPhoneNumber &&
                 /\S/.test(this.dto.address) &&
                 /\S/.test(this.dto.city) &&
                 /\S/.test(this.dto.country) &&
@@ -134,7 +134,7 @@ template: `
                 return flag;
         },
         isCompletePassword () {
-                flag = /\S/.test(this.passwordDTO.newPassword) && /\S/.test(this.confirmPassword) && this.passwordDTO.newPassword.length >= 8 && /\S/.test(this.passwordDTO.oldPassword);
+                let flag = /\S/.test(this.passwordDTO.newPassword) && /\S/.test(this.confirmPassword) && this.passwordDTO.newPassword.length >= 8 && /\S/.test(this.passwordDTO.oldPassword);
                 return flag;
         }
     },

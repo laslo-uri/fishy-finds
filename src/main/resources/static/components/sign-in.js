@@ -20,7 +20,7 @@ template: `
                     <form @submit.prevent="signIn">
                         <input type="email" placeholder="Email" class="ff-field" v-model="user.email"/>
                         <input type="password" placeholder="Password" class="ff-field" v-model="user.password"/>
-                        <input :disabled="!isComplete" @click="signIn" v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}" class="ff-btn ff-btn--primary" type="button" value="Sign in" />
+                        <input :disabled="!isComplete" v-bind:style="{'background-color':backgroundColor, 'cursor':cursorStyle}" class="ff-btn ff-btn--primary" type="submit" value="Sign in" />
                     </form>
                 </div>
             </div>
@@ -29,7 +29,7 @@ template: `
         ,
         computed : {
             isComplete () {
-                flag = /\S/.test(this.user.email) && /\S/.test(this.user.password);
+                let flag = /\S/.test(this.user.email) && /\S/.test(this.user.password);
                 this.backgroundColor = flag ? "#ed1c24" : "#c9a0a2";
                 this.cursorStyle = flag ? "pointer" : "default";
                 return flag;

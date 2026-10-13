@@ -1,6 +1,7 @@
 package com.fishyfinds.isa.controllers.terms;
 
 import com.fishyfinds.isa.dto.ReservationDto;
+import com.fishyfinds.isa.model.beans.offers.ImageItem;
 import com.fishyfinds.isa.model.beans.offers.Offer;
 import com.fishyfinds.isa.model.beans.terms.CancelledReservation;
 import com.fishyfinds.isa.model.beans.terms.Reservation;
@@ -132,14 +133,14 @@ public class ReservationController {
             if(reservations != null){
                 for(Reservation r : reservations){
                     ReservationDto d = new ReservationDto(r);
-                    d.setPath(r.getOffer().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    d.setPath(ImageItem.firstPath(r.getOffer().getImages()));
                     retVal.add(d);
                 }
             }
             if(cancelledReservations != null){
                 for(CancelledReservation r : cancelledReservations){
                     ReservationDto d = new ReservationDto(r);
-                    d.setPath(r.getOffer().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    d.setPath(ImageItem.firstPath(r.getOffer().getImages()));
                     retVal.add(d);
                 }
             }
@@ -165,7 +166,7 @@ public class ReservationController {
             if(res != null){
                 for(Reservation r : res){
                     ReservationDto d = new ReservationDto(r);
-                    d.setPath(r.getOffer().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    d.setPath(ImageItem.firstPath(r.getOffer().getImages()));
                     retVal.add(d);
                 }
             }
@@ -191,7 +192,7 @@ public class ReservationController {
             if(res != null){
                 for(Reservation r : res){
                     ReservationDto d = new ReservationDto(r);
-                    d.setPath(r.getOffer().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                    d.setPath(ImageItem.firstPath(r.getOffer().getImages()));
                     retVal.add(d);
                 }
             }
@@ -211,7 +212,7 @@ public class ReservationController {
         if(res != null){
             for(Reservation r : res){
                 ReservationDto d = new ReservationDto(r);
-                d.setPath(r.getOffer().getImages().stream().filter(i -> i.getName().equals("first")).collect(Collectors.toList()).get(0).getPath());
+                d.setPath(ImageItem.firstPath(r.getOffer().getImages()));
                 retVal.add(d);
             }
         }

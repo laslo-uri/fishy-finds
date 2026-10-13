@@ -165,7 +165,7 @@ template: `
 
 	computed : {
             isCompletePassword () {
-                    flag = /\S/.test(this.passwordDTO.newPassword) && /\S/.test(this.confirmPassword);
+                    let flag = /\S/.test(this.passwordDTO.newPassword) && /\S/.test(this.confirmPassword);
 
                     return flag;
             }

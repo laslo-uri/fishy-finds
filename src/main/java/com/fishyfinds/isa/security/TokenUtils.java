@@ -100,6 +100,7 @@ public class TokenUtils {
             final Date created = getIssuedAtDateFromToken(token);
 
             return (username != null && username.equals(userDetails.getUsername())
+                    && !isTokenExpired(token)
                  /*   && !isCreatedBeforeLastPasswordReset(created, user.getLastPasswordResetDate())*/);
         }
 
@@ -179,7 +180,7 @@ public class TokenUtils {
 
         private Boolean isTokenExpired(String token) {
             final Date expiration = this.getExpirationDateFromToken(token);
-            return expiration.before(new Date());
+            return expiration == null || expiration.before(new Date());
         }
 
         private Boolean ignoreTokenExpiration(String token) {
